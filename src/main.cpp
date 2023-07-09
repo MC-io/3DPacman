@@ -1,32 +1,27 @@
-#include<iostream>
-#include<glad/glad.h>
-#include<GLFW/glfw3.h>
+#include <iostream>
+#include <glad/glad.h>
+#include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
+#include <Shader.h>
 
-const float angle = 3.1415926 * 2.f / 70;
+const char * vertex_shader_file = "C:\\7mo Semestre\\Computacion Grafica\\TrabajoFinal\\src\\shader.vert";
+const char * fragment_shader_file = "C:\\7mo Semestre\\Computacion Grafica\\TrabajoFinal\\src\\shader.frag";
 
-// Vertex Shader source code
-const char *vertexShaderSource = "#version 330 core\n"
-    "layout (location = 0) in vec3 aPos;\n"
-    "layout (location = 1) in vec2 aTexCoord;\n"
-    "out vec2 TexCoord;\n"
-    "uniform mat4 transform;\n"
-    "void main()\n"
-    "{\n"
-    "gl_Position = transform * vec4(aPos, 1.0f);\n"
-    "TexCoord = vec2(aTexCoord.x, aTexCoord.y);\n"
-    "}\0";
+const unsigned int SCR_WIDTH = 800;
+const unsigned int SCR_HEIGHT = 800;
 
-
-const char *fragmentShaderSource = "#version 330 core\n"
-    "out vec4 FragColor;\n"
-    "uniform vec4 ourColor;\n"
-    "void main()\n"
-    "{\n"
-    "   FragColor = ourColor;\n"
-    "}\n\0";
+void framebuffer_size_callback(GLFWwindow* window, int width, int height);
+void updateInput(GLFWwindow * window, glm::vec3& position, glm::vec3& rotation, glm::vec3& scale);
+void create_pacman(GLfloat vertices[], GLuint indices[], int & vert_pos, int & index_pos, int steps, double radius);
+void draw_pacman(int steps, int shaderProgram);
+void create_food();
+void draw_food();
+void create_berry();
+void draw_berry();
+void create_ghost();
+void draw_ghost();
 
 
 int main()
@@ -43,7 +38,7 @@ int main()
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
 	// Create a GLFWwindow object of 800 by 800 pixels, naming it "YoutubeOpenGL"
-	GLFWwindow* window = glfwCreateWindow(800, 800, "YoutubeOpenGL", NULL, NULL);
+	GLFWwindow* window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "Trabajo Final", NULL, NULL);
 	// Error check if the window fails to create
 	if (window == NULL)
 	{
@@ -56,93 +51,28 @@ int main()
 
 	//Load GLAD so it configures OpenGL
 	gladLoadGL();
-	// Specify the viewport of OpenGL in the Window
+	// Specify the viewport of OpenGL in the Windo	w
 	// In this case the viewport goes from x = 0, y = 0, to x = 800, y = 800
-	glViewport(0, 0, 800, 800);
+	glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
+	glEnable(GL_DEPTH_TEST);
 
-
-	// Create Vertex Shader Object and get its reference
-	GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
-	// Attach Vertex Shader source to the Vertex Shader Object
-	glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
-	// Compile the Vertex Shader into machine code
-	glCompileShader(vertexShader);
-
-	// Create Fragment Shader Object and get its reference
-	GLuint fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-	// Attach Fragment Shader source to the Fragment Shader Object
-	glShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL);
-	// Compile the Vertex Shader into machine code
-	glCompileShader(fragmentShader);
-
-	// Create Shader Program Object and get its reference
-	GLuint shaderProgram = glCreateProgram();
-	// Attach the Vertex and Fragment Shaders to the Shader Program
-	glAttachShader(shaderProgram, vertexShader);
-	glAttachShader(shaderProgram, fragmentShader);
-	// Wrap-up/Link all the shaders together into the Shader Program
-	glLinkProgram(shaderProgram);
-
-	// Delete the now useless Vertex and Fragment Shader objects
-	glDeleteShader(vertexShader);
-	glDeleteShader(fragmentShader);
-
-
+	Shader ourShader(vertex_shader_file, fragment_shader_file);
 
 	// Vertices coordinates
-	GLfloat vertices[3 + (3 * (71 * 34) + 3)];
+	GLfloat vertices[100000];
+	GLuint indices[100000];
 
-	vertices[0] = 0.4 * sin(0); 
-	vertices[1] = -0.4 * cos(0); 
-	vertices[2] = 0.0f;
-	for (int i = 0; i < 34; i++)
-	{
-		vertices[3 + (3 * 71 * i)] = 0.4 * sin(angle * (i + 1)); 
-		vertices[3 + (3 * 71 * i + 1)] = -0.4 * cos(angle * (i + 1)); 
-		vertices[3 + (3 * 71 * i + 2)] = 0.0f;
 
-		for (int j = 1; j <= 70; j++)
-		{
-			glm::mat4 trans = glm::mat4(1.0f); // make sure to initialize matrix to identity matrix first
-			trans = glm::rotate(trans, angle, glm::vec3(0.0, 1.0, 0.0));
-			glm::vec4 newm = trans * glm::vec4(vertices[3 + (3 * (71 * i + (j - 1)))], vertices[3 + (3 * (71 * i + (j - 1))) + 1], vertices[3 + (3 * (71 * i + (j - 1))) + 2], 0.0f);
-			vertices[3 + (3 * (71 * i + j))] = newm[0];
-			vertices[3 + (3 * (71 * i + j) + 1)] = newm[1];
-			vertices[3 + (3 * (71 * i + j) + 2)] = newm[2]; 
-		}
-	}
-	vertices[3 + (3 * (71 * 34))] =  0.4 * sin(angle * 35); 
-	vertices[3 + (3 * (71 * 34) + 1)] = -0.4 * cos(angle * 35); 
-	vertices[3 + (3 * (71 * 34) + 2)] = 0.0f;
+	int steps = 100;	// La cantidad de lineas para hacer la figura semejante al circulo que ira rotando, por conveniencia que sea un numero par
+	double radius = 0.5; // ancho del pacman en terminos de la contextura de la ventana, siempre es positivo
+	int vert_pos = 0; // Posicion del nuevo vertice a colocar para el arreglo, como solo tenemos al pacman es 0
+	int index_pos = 0; // Lo mismo pero con los indices
 
-	GLuint indices[14484];
+	create_pacman(vertices, indices, vert_pos, index_pos, steps, radius);
+	// Al terminar esta funcion, actualiza los nuevos valores de vertpos e indexpos para colocar otros vertices e indices
 
-	for (int i = 0; i <= 70; i++)
-	{
-		indices[i * 3] = 0;
-		indices[i * 3 + 1] = i + 1;  
-		indices[i * 3 + 2] = i + 2;
-	}
-	for (int i = 1; i < 34; i++)
-	{
-		for (int j = 0; j <= 70; j++)
-		{
-			indices[213 + ((i - 1) * 71 * 6) + j * 6] = 1 + 71 * (i - 1) + j;
-			indices[213 + ((i - 1) * 71 * 6) + j * 6 + 1] = 1 + 71 * (i - 1) + j + 1;
-			indices[213 + ((i - 1) * 71 * 6) + j * 6 + 2] =  1 + 71 * i + j;
 
-			indices[213 + ((i - 1) * 71 * 6) + j * 6 + 3] = 1 + 71 * (i - 1) + j + 1;
-			indices[213 + ((i - 1) * 71 * 6) + j * 6 + 4] = 1 + 71 * i + j;
-			indices[213 + ((i - 1) * 71 * 6) + j * 6 + 5] = 1 + 71 * i + j + 1;
-		}
-	}
-	for (int i = 0; i <= 70; i++)
-	{
-		indices[213 + ((34 - 1) * 71 * 6) + i * 3] = 1 + 71 * 33 + i;
-		indices[213 + ((34 - 1) * 71 * 6) + i * 3 + 1] = 1 + 71 * 33 + i + 1;
-		indices[213 + ((34 - 1) * 71 * 6) + i * 3 + 2] = 1 + 71 * 34;
-	}
 	// Create reference containers for the Vartex Array Object, the Vertex Buffer Object, and the Element Buffer Object
 	GLuint VAO, VBO, EBO;
 
@@ -176,9 +106,21 @@ int main()
 	// MAKE SURE TO UNBIND IT AFTER UNBINDING THE VAO, as the EBO is linked in the VAO
 	// This does not apply to the VBO because the VBO is already linked to the VAO during glVertexAttribPointer
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-	double factor = 1;
 
-	glm::mat4 prev_transform = glm::mat4(1.0f);
+
+	glm::vec3 position(0.f);
+	glm::vec3 rotation(0.f);
+	glm::vec3 scale(1.f);
+
+	rotation.x = 90.f;
+
+	glm::mat4 transform = glm::mat4(1.0f);
+	transform = glm::translate(transform, position);
+	transform = glm::rotate(transform, glm::radians(rotation.x), glm::vec3(1.0f, 0.0f, 0.0f));
+	transform = glm::rotate(transform, glm::radians(rotation.y), glm::vec3(0.0f, 1.0f, 0.0f));
+	transform = glm::rotate(transform, glm::radians(rotation.z), glm::vec3(0.0f, 0.0f, 1.0f));
+	transform = glm::scale(transform, scale);
+
 
     glEnable(GL_DEPTH_TEST); 
 	// Main while loop
@@ -189,89 +131,236 @@ int main()
 		// Clean the back buffer and assign the new color to it
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 		// Tell OpenGL which Shader Program we want to use
-		glUseProgram(shaderProgram);
+		ourShader.use();
 		// Bind the VAO so OpenGL knows to use it
 
 
         double  timeValue = glfwGetTime();
-        int vertexColorLocation = glGetUniformLocation(shaderProgram, "ourColor");
+        int vertexColorLocation = glGetUniformLocation(ourShader.ID, "ourColor");
         glUniform4f(vertexColorLocation, 1.0f, 0.0f, 0.0f, 1.0f);
 
+        updateInput(window, position, rotation, scale);
 
          // create transformations
-		glm::mat4 transform = prev_transform; // make sure to initialize matrix to identity matrix first
+		glm::mat4 transform = glm::mat4(1.0f);
+		transform = glm::translate(transform, position);
+		transform = glm::rotate(transform, glm::radians(rotation.x), glm::vec3(1.0f, 0.0f, 0.0f));
+		transform = glm::rotate(transform, glm::radians(rotation.y), glm::vec3(0.0f, 1.0f, 0.0f));
+		transform = glm::rotate(transform, glm::radians(rotation.z), glm::vec3(0.0f, 0.0f, 1.0f));
+		transform = glm::scale(transform, scale);
 
-        if (glfwGetKey(window,GLFW_KEY_UP) == GLFW_PRESS)
-        {
-            transform = glm::rotate(transform, 0.001f, glm::vec3(1.0, 0.0, 0.0));
-        }
-        if (glfwGetKey(window,GLFW_KEY_DOWN) == GLFW_PRESS)
-        {
-            transform = glm::rotate(transform, 0.001f, glm::vec3(-1.0, 0.0, 0.0));
-        }
-        if (glfwGetKey(window,GLFW_KEY_RIGHT) == GLFW_PRESS)
-        {
-            transform = glm::rotate(transform, 0.001f, glm::vec3(0.0, -1.0, 0.0));
-        }
-        if (glfwGetKey(window,GLFW_KEY_LEFT) == GLFW_PRESS)
-        {
-            transform = glm::rotate(transform, 0.001f, glm::vec3(0.0, 1.0, 0.0));
-        }
-        if (glfwGetKey(window,GLFW_KEY_F) == GLFW_PRESS)
-        {
-            transform = glm::rotate(transform, 0.001f, glm::vec3(0.0, 0.0, 1.0));
-        }
-        if (glfwGetKey(window,GLFW_KEY_G) == GLFW_PRESS)
-        {
-            transform = glm::rotate(transform, 0.001f, glm::vec3(0.0, 0.0, -1.0));
-        }
-		prev_transform = transform;
-		factor *= 1.00005;
-        unsigned int transformLoc = glGetUniformLocation(shaderProgram, "transform");
-        glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(transform));
+        ourShader.setMat4("model", transform);
 
+		glm::mat4 view = glm::mat4(1.0f);
+		view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f)); 
+        ourShader.setMat4("view", view);
+
+		glm::mat4 projection;
+		projection = glm::perspective(glm::radians(45.0f), 800.0f / 800.0f, 0.1f, 100.0f);
+		ourShader.setMat4("projection", projection);
+	
         // draw our first triangle
-        glUseProgram(shaderProgram);
+        ourShader.use();
+		
         glBindVertexArray(VAO); // seeing as we only have a single VAO there's no need to bind it every time, but we'll do so to keep things a bit more organized
 		// Draw primitives, number of indices, datatype of indices, index of indices
 
-		for (int i = 0; i <= 71; i++)
-		{
-			if (i % 3 == 0)
-			{
-				glUniform4f(vertexColorLocation, 1.0f, 0.0f, 0.0f, 1.0f);
-			}
-			else if (i % 3 == 1)
-			{
-				glUniform4f(vertexColorLocation, 0.0f, 1.0f, 0.0f, 1.0f);
-			}
-			else
-			{
-				glUniform4f(vertexColorLocation, 0.0f, 0.0f, 1.0f, 1.0f);
-			}
-			glDrawElements(GL_TRIANGLES, 68 * 3, GL_UNSIGNED_INT, (void*)(i * 68 * 3  * sizeof(float)));
-
-		}
-
-
+		// Dibujando el pacman
+		draw_pacman(steps, ourShader.ID);
+		
 		// Swap the back buffer with the front buffer
 		glfwSwapBuffers(window);
 		// Take care of all GLFW events
 		glfwPollEvents();
 	}
 
-
-
 	// Delete all the objects we've created
 	glDeleteVertexArrays(1, &VAO);
 	glDeleteBuffers(1, &VBO);
 	glDeleteBuffers(1, &EBO);
-	glDeleteProgram(shaderProgram);
+
+	ourShader.Delete();
+	
 	// Delete window before ending the program
 	glfwDestroyWindow(window);
 	// Terminate GLFW before ending the program
 	glfwTerminate();
 	return 0;
+}
+
+
+void create_pacman(GLfloat vertices[], GLuint indices[], int & vert_pos, int & index_pos, int steps, double radius)
+{
+	const float angle = 3.1415926 * 2.f / steps;
+	vertices[vert_pos + 0] = radius * sin(0); 
+	vertices[vert_pos + 1] = -radius * cos(0); 
+	vertices[vert_pos + 2] = 0.0f;
+
+	for (int i = 0; i < (steps / 2) - 1; i++)
+	{
+		vertices[vert_pos + 3 * (1 + (steps + 1) * i)] = radius * sin(angle * (i + 1)); 
+		vertices[vert_pos + 3 * (1 + (steps + 1) * i) + 1] = -radius * cos(angle * (i + 1)); 
+		vertices[vert_pos + 3 * (1 + (steps + 1) * i) + 2] = 0.0f;
+
+		for (int j = 1; j <= steps; j++)
+		{
+			glm::mat4 trans = glm::mat4(1.0f);
+			trans = glm::rotate(trans, angle, glm::vec3(0.0, 1.0, 0.0));
+			glm::vec4 newm = trans * glm::vec4(vertices[vert_pos + 3 * (1 + ((steps + 1) * i + (j - 1)))],
+			 									vertices[vert_pos + 3 * (1 + ((steps + 1) * i + (j - 1))) + 1],
+			  									vertices[vert_pos + 3 * (1 + ((steps + 1) * i + (j - 1))) + 2], 0.0f);
+			vertices[vert_pos + 3 * (1 + ((steps + 1) * i + j))] = newm[0];
+			vertices[vert_pos + 3 * (1 + ((steps + 1) * i + j)) + 1] = newm[1];
+			vertices[vert_pos + 3 * (1 + ((steps + 1) * i + j)) + 2] = newm[2]; 
+		}
+	}
+	vertices[vert_pos + 3 * (1 + ((steps + 1) * (steps / 2 - 1)))] =  radius * sin(angle * (steps / 2)); 
+	vertices[vert_pos + 3 * (1 + ((steps + 1) * (steps / 2 - 1))) + 1] = -radius * cos(angle * (steps / 2)); 
+	vertices[vert_pos + 3 * (1 + ((steps + 1) * (steps / 2 - 1))) + 2] = 0.0f;
+
+	vertices[vert_pos + 3 * (1 + ((steps + 1) * (steps / 2 - 1))) + 3] = 0.0f;
+	vertices[vert_pos + 3 * (1 + ((steps + 1) * (steps / 2 - 1))) + 4] = 0.0f; 
+	vertices[vert_pos + 3 * (1 + ((steps + 1) * (steps / 2 - 1))) + 5] = 0.0f;
+
+	for (int i = 0; i <= steps; i++)
+	{
+		indices[index_pos + i * 3] = (vert_pos / 3) + 0;
+		indices[index_pos + i * 3 + 1] = (vert_pos / 3) + i + 1;  
+		indices[index_pos + i * 3 + 2] = (vert_pos / 3) + i + 2;
+
+		indices[index_pos + ((steps + 1) * (steps / 2 - 1) * 6) + i * 3] = (vert_pos / 3) + (steps + 1) * (steps / 2 - 1) + 2;
+		indices[index_pos + ((steps + 1) * (steps / 2 - 1) * 6) + i * 3 + 1] =  (vert_pos / 3) + i + 1;
+		indices[index_pos + ((steps + 1) * (steps / 2 - 1) * 6) + i * 3 + 2] = (vert_pos / 3) + 0;
+	}
+	for (int i = 1; i < (steps / 2) - 1; i++)
+	{
+		for (int j = 0; j <= steps; j++)
+		{
+			indices[index_pos + (steps + 1) * 3 + ((i - 1) * (steps + 1) * 6) + j * 6] = (vert_pos / 3) + 1 + (steps + 1) * (i - 1) + j;
+			indices[index_pos + (steps + 1) * 3 + ((i - 1) * (steps + 1) * 6) + j * 6 + 1] = (vert_pos / 3) + 1 + (steps + 1) * (i - 1) + j + 1;
+			indices[index_pos + (steps + 1) * 3 + ((i - 1) * (steps + 1) * 6) + j * 6 + 2] = (vert_pos / 3) + 1 + (steps + 1) * i + j;
+
+			indices[index_pos + (steps + 1) * 3 + ((i - 1) * (steps + 1) * 6) + j * 6 + 3] = (vert_pos / 3) + 1 + (steps + 1) * (i - 1) + j + 1;
+			indices[index_pos + (steps + 1) * 3 + ((i - 1) * (steps + 1) * 6) + j * 6 + 4] = (vert_pos / 3) + 1 + (steps + 1) * i + j;
+			indices[index_pos + (steps + 1) * 3 + ((i - 1) * (steps + 1) * 6) + j * 6 + 5] = (vert_pos / 3) + 1 + (steps + 1) * i + j + 1;
+
+			indices[index_pos + ((steps + 1) * (steps / 2 - 1) * 6) + ((steps + 1) * i * 3) + j * 3] = (vert_pos / 3) + 1 + (steps + 1) * (i - 1) + j;
+			indices[index_pos + ((steps + 1) * (steps / 2 - 1) * 6) + ((steps + 1) * i * 3) + j * 3 + 1] = (vert_pos / 3) + 1 + (steps + 1) * i + j;
+			indices[index_pos + ((steps + 1) * (steps / 2 - 1) * 6) + ((steps + 1) * i * 3) + j * 3 + 2] = (vert_pos / 3) + (steps + 1) * (steps / 2 - 1) + 2;
+
+		}
+	}
+	for (int i = 0; i <= steps; i++)
+	{
+		indices[index_pos + (steps + 1) * 3 + (((steps / 2) - 1 - 1) * (steps + 1) * 6) + i * 3] = (vert_pos / 3) + 1 + (steps + 1) * ((steps / 2) - 2) + i;
+		indices[index_pos + (steps + 1) * 3 + (((steps / 2) - 1 - 1) * (steps + 1) * 6) + i * 3 + 1] = (vert_pos / 3) + 1 + (steps + 1) * ((steps / 2) - 2) + i + 1;
+		indices[index_pos + (steps + 1) * 3 + (((steps / 2) - 1 - 1) * (steps + 1) * 6) + i * 3 + 2] = (vert_pos / 3) + 1 + (steps + 1) * ((steps / 2) - 1);
+
+		indices[index_pos + ((steps + 1) * (steps / 2 - 1) * 6) + ((steps + 1) * (steps / 2 - 1) * 3) + i * 3] = (vert_pos / 3) + (steps + 1) * (steps / 2 - 1) + 2;
+		indices[index_pos + ((steps + 1) * (steps / 2 - 1) * 6) + ((steps + 1) * (steps / 2 - 1) * 3) + i * 3 + 1] = (vert_pos / 3) + 1 + (steps + 1) * (steps / 2 - 2) + i;
+		indices[index_pos + ((steps + 1) * (steps / 2 - 1) * 6) + ((steps + 1) * (steps / 2 - 1) * 3) + i * 3 + 2] = (vert_pos / 3) + (steps + 1) * (steps / 2 - 1) + 1;
+	}
+
+	vert_pos += 3 * (steps + 1) * (steps / 2 - 1) + 9;
+	index_pos += ((steps + 1) * (steps / 2 - 1) * 6) + ((steps + 1) * (steps / 2 - 1) * 3) + (steps + 1) * 3 + 3;
+}
+
+void draw_pacman(int steps, int shaderProgram)
+{
+	double  timeValue = glfwGetTime();
+	int vertexColorLocation = glGetUniformLocation(shaderProgram, "ourColor");
+	glUniform4f(vertexColorLocation, 1.0f, 0.0f, 0.0f, 1.0f);
+	int change =  (steps + 1) * 3 - 3 * (int)(sin(timeValue * 10) * (steps / 12) + (steps / 12) + 1);
+	glUniform4f(vertexColorLocation, 1.0f, 0.8f, 0.0f, 1.0f);
+	glDrawElements(GL_TRIANGLES, change - ((steps + 1) * 3 - change), GL_UNSIGNED_INT, (void*)(((steps + 1) * 3 - change) * sizeof(float)));
+
+	for (int i = 0; i < (steps / 2 - 2); i++)
+		glDrawElements(GL_TRIANGLES, (change - ((steps + 1) * 3 - change)) * 2, GL_UNSIGNED_INT, (void*)((((steps + 1) * 6 - change * 2) + (steps + 1) * 3 + (steps + 1) * 6 * i) * sizeof(float)));
+
+	glDrawElements(GL_TRIANGLES, change - ((steps + 1) * 3 - change), GL_UNSIGNED_INT, (void*)((((steps + 1) * 3 - change) + (steps + 1) * 3 + (steps + 1) * 6 * (steps / 2 - 2)) * sizeof(float)));
+
+	glUniform4f(vertexColorLocation, 0.0f, 0.0f, 0.0f, 1.0f);
+	for (int i = 0; i < steps / 2; i++)
+	{
+		glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, (void*)(((steps + 1) * (steps / 2 - 1) * 6 + i * (steps + 1) * 3 + (steps + 1) * 3 - change) * sizeof(float)));
+		glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, (void*)(((steps + 1) * (steps / 2 - 1) * 6 + i * (steps + 1) * 3 + change) * sizeof(float)));
+	}
+}
+
+void updateInput(GLFWwindow * window, glm::vec3& position, glm::vec3& rotation, glm::vec3& scale)
+{
+	if (glfwGetKey(window,GLFW_KEY_UP) == GLFW_PRESS)
+	{
+		rotation.y += 0.1f;
+	}
+	if (glfwGetKey(window,GLFW_KEY_DOWN) == GLFW_PRESS)
+	{
+		rotation.y -= 0.1f;
+	}
+	if (glfwGetKey(window,GLFW_KEY_RIGHT) == GLFW_PRESS)
+	{
+		rotation.x += 0.1f;
+	}
+	if (glfwGetKey(window,GLFW_KEY_LEFT) == GLFW_PRESS)
+	{
+		rotation.x -= 0.1f;
+	}
+	if (glfwGetKey(window,GLFW_KEY_F) == GLFW_PRESS)
+	{
+		rotation.z += 0.1f;
+	}
+	if (glfwGetKey(window,GLFW_KEY_G) == GLFW_PRESS)
+	{
+		rotation.z -= 0.1f;
+	}
+	if (glfwGetKey(window,GLFW_KEY_A) == GLFW_PRESS)
+	{
+		position.x += 0.001f;
+	}
+	if (glfwGetKey(window,GLFW_KEY_D) == GLFW_PRESS)
+	{
+		position.x -= 0.001f;
+	}
+	if (glfwGetKey(window,GLFW_KEY_W) == GLFW_PRESS)
+	{
+		position.z -= 0.001f;
+	}
+	if (glfwGetKey(window,GLFW_KEY_S) == GLFW_PRESS)
+	{
+		position.z += 0.001f;
+	}
+}
+
+void create_food()
+{
+
+}
+void draw_food()
+{
+
+}
+void create_berry()
+{
+
+}
+void draw_berry()
+{
+
+}
+void create_ghost()
+{
+
+}
+void draw_ghost()
+{
+
+}
+
+void framebuffer_size_callback(GLFWwindow* window, int width, int height)
+{
+    // make sure the viewport matches the new window dimensions; note that width and 
+    // height will be significantly larger than specified on retina displays.
+    glViewport(0, 0, width, height);
 }
 
         
