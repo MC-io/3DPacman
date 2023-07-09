@@ -121,8 +121,6 @@ int main()
 	transform = glm::rotate(transform, glm::radians(rotation.z), glm::vec3(0.0f, 0.0f, 1.0f));
 	transform = glm::scale(transform, scale);
 
-
-    glEnable(GL_DEPTH_TEST); 
 	// Main while loop
 	while (!glfwWindowShouldClose(window))
 	{
@@ -134,10 +132,8 @@ int main()
 		ourShader.use();
 		// Bind the VAO so OpenGL knows to use it
 
-
         double  timeValue = glfwGetTime();
-        int vertexColorLocation = glGetUniformLocation(ourShader.ID, "ourColor");
-        glUniform4f(vertexColorLocation, 1.0f, 0.0f, 0.0f, 1.0f);
+        ourShader.setFloat4("ourColor", 1.0f, 0.0f, 0.0f, 1.0f);
 
         updateInput(window, position, rotation, scale);
 
