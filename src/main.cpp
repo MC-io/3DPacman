@@ -64,7 +64,7 @@ int main()
 	GLuint indices[100000];
 
 
-	int steps = 100;	// La cantidad de lineas para hacer la figura semejante al circulo que ira rotando, por conveniencia que sea un numero par
+	int steps = 30;	// La cantidad de lineas para hacer la figura semejante al circulo que ira rotando, por conveniencia que sea un numero par
 	double radius = 0.5; // ancho del pacman en terminos de la contextura de la ventana, siempre es positivo
 	int vert_pos = 0; // Posicion del nuevo vertice a colocar para el arreglo, como solo tenemos al pacman es 0
 	int index_pos = 0; // Lo mismo pero con los indices
@@ -132,7 +132,6 @@ int main()
 		ourShader.use();
 		// Bind the VAO so OpenGL knows to use it
 
-        double  timeValue = glfwGetTime();
         ourShader.setFloat4("ourColor", 1.0f, 0.0f, 0.0f, 1.0f);
 
         updateInput(window, position, rotation, scale);
