@@ -1,21 +1,21 @@
 #ifndef PACMAN_CLASS_H
 #define PACMAN_CLASS_H
+
 #include <glm/glm.hpp>
-#include<glad/glad.h>
-#include<string>
-#include<fstream>
-#include<sstream>
-#include<iostream>
-#include<cerrno>
+#include <glad/glad.h>
+#include <string>
+#include <fstream>
+#include <sstream>
+#include <iostream>
+#include <cerrno>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
-#include<GLFW/glfw3.h>
+#include <GLFW/glfw3.h>
 #include "Shader.h"
 
 class Pacman
 {
 public:
-	
 	GLuint ID;
     GLfloat* vertices;
     GLuint* indices;
@@ -28,15 +28,18 @@ public:
         radius = radius_;
         steps = steps_;
     }
-    int getSizeV(){
+    int getSizeV()
+	{
         return vsize;
     }
-    int getSizeI(){
+    int getSizeI()
+	{
         return isize;
     }
-    ~Pacman() {
-        delete[] vertices;
-        delete[] indices;
+    ~Pacman() 
+	{
+        delete [] vertices;
+        delete [] indices;
     }
     void createPacman(int  &vert_pos, int  &index_pos)
 	{
@@ -116,10 +119,8 @@ public:
      void draw(Shader shaderProgram)
 	 {
         double  timeValue = glfwGetTime();
-        int vertexColorLocation = glGetUniformLocation(shaderProgram.ID, "ourColor");
-        glUniform4f(vertexColorLocation, 1.0f, 0.0f, 0.0f, 1.0f);
         int change =  (steps + 1) * 3 - 3 * (int)(sin(timeValue * 10) * (steps / 12) + (steps / 12) + 1);
-        glUniform4f(vertexColorLocation, 1.0f, 0.8f, 0.0f, 1.0f);
+        shaderProgram.setFloat4("ourColor",  1.0f, 0.8f, 0.0f, 1.0f);
         glDrawElements(GL_TRIANGLES, change - ((steps + 1) * 3 - change), GL_UNSIGNED_INT, (void*)(((steps + 1) * 3 - change) * sizeof(float)));
 
         for (int i = 0; i < (steps / 2 - 2); i++)
@@ -127,7 +128,7 @@ public:
 
         glDrawElements(GL_TRIANGLES, change - ((steps + 1) * 3 - change), GL_UNSIGNED_INT, (void*)((((steps + 1) * 3 - change) + (steps + 1) * 3 + (steps + 1) * 6 * (steps / 2 - 2)) * sizeof(float)));
 
-        glUniform4f(vertexColorLocation, 0.0f, 0.0f, 0.0f, 1.0f);
+		shaderProgram.setFloat4("ourColor", 0.0f, 0.0f, 0.0f, 1.0f);
         for (int i = 0; i < steps / 2; i++)
         {
             glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, (void*)(((steps + 1) * (steps / 2 - 1) * 6 + i * (steps + 1) * 3 + (steps + 1) * 3 - change) * sizeof(float)));

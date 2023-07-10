@@ -18,15 +18,6 @@ const unsigned int SCR_HEIGHT = 800;
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void updateInput(GLFWwindow * window, glm::vec3& position, glm::vec3& rotation, glm::vec3& scale);
-void create_pacman(GLfloat vertices[], GLuint indices[], int & vert_pos, int & index_pos, int steps, double radius);
-void draw_pacman(int steps, int shaderProgram);
-void create_food();
-void draw_food();
-void create_berry();
-void draw_berry();
-void create_ghost();
-void draw_ghost();
-
 
 int main()
 {
@@ -63,11 +54,6 @@ int main()
 
 	Shader ourShader(vertex_shader_file, fragment_shader_file);
 
-	// Vertices coordinates
-	GLfloat vertices[100000];
-	GLuint indices[100000];
-
-
 	int steps = 30;	// La cantidad de lineas para hacer la figura semejante al circulo que ira rotando, por conveniencia que sea un numero par
 	double radius = 0.5; // ancho del pacman en terminos de la contextura de la ventana, siempre es positivo
 	int vert_pos = 0; // Posicion del nuevo vertice a colocar para el arreglo, como solo tenemos al pacman es 0
@@ -96,19 +82,17 @@ int main()
 	VBO1.Unbind();
 	EBO1.Unbind();
 
-
 	glm::vec3 position(0.f);
 	glm::vec3 rotation(0.f);
 	glm::vec3 scale(1.f);
 
 	rotation.x = 90.f;
-
-	glm::mat4 transform = glm::mat4(1.0f);
-	transform = glm::translate(transform, position);
-	transform = glm::rotate(transform, glm::radians(rotation.x), glm::vec3(1.0f, 0.0f, 0.0f));
-	transform = glm::rotate(transform, glm::radians(rotation.y), glm::vec3(0.0f, 1.0f, 0.0f));
-	transform = glm::rotate(transform, glm::radians(rotation.z), glm::vec3(0.0f, 0.0f, 1.0f));
-	transform = glm::scale(transform, scale);
+	glm::mat4 model = glm::mat4(1.0f);
+	model = glm::translate(model, position);
+	model = glm::rotate(model, glm::radians(rotation.x), glm::vec3(1.0f, 0.0f, 0.0f));
+	model = glm::rotate(model, glm::radians(rotation.y), glm::vec3(0.0f, 1.0f, 0.0f));
+	model = glm::rotate(model, glm::radians(rotation.z), glm::vec3(0.0f, 0.0f, 1.0f));
+	model = glm::scale(model, scale);
 
 	// Main while loop
 	while (!glfwWindowShouldClose(window))
@@ -120,20 +104,21 @@ int main()
 		// Tell OpenGL which Shader Program we want to use
 		ourShader.use();
 		// Bind the VAO so OpenGL knows to use it
+		VAO1.Bind();		// Draw primitives, number of indices, datatype of indices, index of indices
 
         ourShader.setFloat4("ourColor", 1.0f, 0.0f, 0.0f, 1.0f);
 
         updateInput(window, position, rotation, scale);
 
          // create transformations
-		glm::mat4 transform = glm::mat4(1.0f);
-		transform = glm::translate(transform, position);
-		transform = glm::rotate(transform, glm::radians(rotation.x), glm::vec3(1.0f, 0.0f, 0.0f));
-		transform = glm::rotate(transform, glm::radians(rotation.y), glm::vec3(0.0f, 1.0f, 0.0f));
-		transform = glm::rotate(transform, glm::radians(rotation.z), glm::vec3(0.0f, 0.0f, 1.0f));
-		transform = glm::scale(transform, scale);
+		model = glm::mat4(1.0f);
+		model = glm::translate(model, position);
+		model = glm::rotate(model, glm::radians(rotation.x), glm::vec3(1.0f, 0.0f, 0.0f));
+		model = glm::rotate(model, glm::radians(rotation.y), glm::vec3(0.0f, 1.0f, 0.0f));
+		model = glm::rotate(model, glm::radians(rotation.z), glm::vec3(0.0f, 0.0f, 1.0f));
+		model = glm::scale(model, scale);
 
-        ourShader.setMat4("model", transform);
+        ourShader.setMat4("model", model);
 
 		glm::mat4 view = glm::mat4(1.0f);
 		view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f)); 
@@ -146,8 +131,6 @@ int main()
         // draw our first triangle
         ourShader.use();
 		
-		VAO1.Bind();		// Draw primitives, number of indices, datatype of indices, index of indices
-
 		// Dibujando el pacman
 		pacman.draw(ourShader);
 		
@@ -171,104 +154,6 @@ int main()
 	return 0;
 }
 
-
-void create_pacman(GLfloat vertices[], GLuint indices[], int & vert_pos, int & index_pos, int steps, double radius)
-{
-	const float angle = 3.1415926 * 2.f / steps;
-	vertices[vert_pos + 0] = radius * sin(0); 
-	vertices[vert_pos + 1] = -radius * cos(0); 
-	vertices[vert_pos + 2] = 0.0f;
-
-	for (int i = 0; i < (steps / 2) - 1; i++)
-	{
-		vertices[vert_pos + 3 * (1 + (steps + 1) * i)] = radius * sin(angle * (i + 1)); 
-		vertices[vert_pos + 3 * (1 + (steps + 1) * i) + 1] = -radius * cos(angle * (i + 1)); 
-		vertices[vert_pos + 3 * (1 + (steps + 1) * i) + 2] = 0.0f;
-
-		for (int j = 1; j <= steps; j++)
-		{
-			glm::mat4 trans = glm::mat4(1.0f);
-			trans = glm::rotate(trans, angle, glm::vec3(0.0, 1.0, 0.0));
-			glm::vec4 newm = trans * glm::vec4(vertices[vert_pos + 3 * (1 + ((steps + 1) * i + (j - 1)))],
-			 									vertices[vert_pos + 3 * (1 + ((steps + 1) * i + (j - 1))) + 1],
-			  									vertices[vert_pos + 3 * (1 + ((steps + 1) * i + (j - 1))) + 2], 0.0f);
-			vertices[vert_pos + 3 * (1 + ((steps + 1) * i + j))] = newm[0];
-			vertices[vert_pos + 3 * (1 + ((steps + 1) * i + j)) + 1] = newm[1];
-			vertices[vert_pos + 3 * (1 + ((steps + 1) * i + j)) + 2] = newm[2]; 
-		}
-	}
-	vertices[vert_pos + 3 * (1 + ((steps + 1) * (steps / 2 - 1)))] =  radius * sin(angle * (steps / 2)); 
-	vertices[vert_pos + 3 * (1 + ((steps + 1) * (steps / 2 - 1))) + 1] = -radius * cos(angle * (steps / 2)); 
-	vertices[vert_pos + 3 * (1 + ((steps + 1) * (steps / 2 - 1))) + 2] = 0.0f;
-
-	vertices[vert_pos + 3 * (1 + ((steps + 1) * (steps / 2 - 1))) + 3] = 0.0f;
-	vertices[vert_pos + 3 * (1 + ((steps + 1) * (steps / 2 - 1))) + 4] = 0.0f; 
-	vertices[vert_pos + 3 * (1 + ((steps + 1) * (steps / 2 - 1))) + 5] = 0.0f;
-
-	for (int i = 0; i <= steps; i++)
-	{
-		indices[index_pos + i * 3] = (vert_pos / 3) + 0;
-		indices[index_pos + i * 3 + 1] = (vert_pos / 3) + i + 1;  
-		indices[index_pos + i * 3 + 2] = (vert_pos / 3) + i + 2;
-
-		indices[index_pos + ((steps + 1) * (steps / 2 - 1) * 6) + i * 3] = (vert_pos / 3) + (steps + 1) * (steps / 2 - 1) + 2;
-		indices[index_pos + ((steps + 1) * (steps / 2 - 1) * 6) + i * 3 + 1] =  (vert_pos / 3) + i + 1;
-		indices[index_pos + ((steps + 1) * (steps / 2 - 1) * 6) + i * 3 + 2] = (vert_pos / 3) + 0;
-	}
-	for (int i = 1; i < (steps / 2) - 1; i++)
-	{
-		for (int j = 0; j <= steps; j++)
-		{
-			indices[index_pos + (steps + 1) * 3 + ((i - 1) * (steps + 1) * 6) + j * 6] = (vert_pos / 3) + 1 + (steps + 1) * (i - 1) + j;
-			indices[index_pos + (steps + 1) * 3 + ((i - 1) * (steps + 1) * 6) + j * 6 + 1] = (vert_pos / 3) + 1 + (steps + 1) * (i - 1) + j + 1;
-			indices[index_pos + (steps + 1) * 3 + ((i - 1) * (steps + 1) * 6) + j * 6 + 2] = (vert_pos / 3) + 1 + (steps + 1) * i + j;
-
-			indices[index_pos + (steps + 1) * 3 + ((i - 1) * (steps + 1) * 6) + j * 6 + 3] = (vert_pos / 3) + 1 + (steps + 1) * (i - 1) + j + 1;
-			indices[index_pos + (steps + 1) * 3 + ((i - 1) * (steps + 1) * 6) + j * 6 + 4] = (vert_pos / 3) + 1 + (steps + 1) * i + j;
-			indices[index_pos + (steps + 1) * 3 + ((i - 1) * (steps + 1) * 6) + j * 6 + 5] = (vert_pos / 3) + 1 + (steps + 1) * i + j + 1;
-
-			indices[index_pos + ((steps + 1) * (steps / 2 - 1) * 6) + ((steps + 1) * i * 3) + j * 3] = (vert_pos / 3) + 1 + (steps + 1) * (i - 1) + j;
-			indices[index_pos + ((steps + 1) * (steps / 2 - 1) * 6) + ((steps + 1) * i * 3) + j * 3 + 1] = (vert_pos / 3) + 1 + (steps + 1) * i + j;
-			indices[index_pos + ((steps + 1) * (steps / 2 - 1) * 6) + ((steps + 1) * i * 3) + j * 3 + 2] = (vert_pos / 3) + (steps + 1) * (steps / 2 - 1) + 2;
-
-		}
-	}
-	for (int i = 0; i <= steps; i++)
-	{
-		indices[index_pos + (steps + 1) * 3 + (((steps / 2) - 1 - 1) * (steps + 1) * 6) + i * 3] = (vert_pos / 3) + 1 + (steps + 1) * ((steps / 2) - 2) + i;
-		indices[index_pos + (steps + 1) * 3 + (((steps / 2) - 1 - 1) * (steps + 1) * 6) + i * 3 + 1] = (vert_pos / 3) + 1 + (steps + 1) * ((steps / 2) - 2) + i + 1;
-		indices[index_pos + (steps + 1) * 3 + (((steps / 2) - 1 - 1) * (steps + 1) * 6) + i * 3 + 2] = (vert_pos / 3) + 1 + (steps + 1) * ((steps / 2) - 1);
-
-		indices[index_pos + ((steps + 1) * (steps / 2 - 1) * 6) + ((steps + 1) * (steps / 2 - 1) * 3) + i * 3] = (vert_pos / 3) + (steps + 1) * (steps / 2 - 1) + 2;
-		indices[index_pos + ((steps + 1) * (steps / 2 - 1) * 6) + ((steps + 1) * (steps / 2 - 1) * 3) + i * 3 + 1] = (vert_pos / 3) + 1 + (steps + 1) * (steps / 2 - 2) + i;
-		indices[index_pos + ((steps + 1) * (steps / 2 - 1) * 6) + ((steps + 1) * (steps / 2 - 1) * 3) + i * 3 + 2] = (vert_pos / 3) + (steps + 1) * (steps / 2 - 1) + 1;
-	}
-
-	vert_pos += 3 * (steps + 1) * (steps / 2 - 1) + 9;
-	index_pos += ((steps + 1) * (steps / 2 - 1) * 6) + ((steps + 1) * (steps / 2 - 1) * 3) + (steps + 1) * 3 + 3;
-}
-
-void draw_pacman(int steps, int shaderProgram)
-{
-	double  timeValue = glfwGetTime();
-	int vertexColorLocation = glGetUniformLocation(shaderProgram, "ourColor");
-	glUniform4f(vertexColorLocation, 1.0f, 0.0f, 0.0f, 1.0f);
-	int change =  (steps + 1) * 3 - 3 * (int)(sin(timeValue * 10) * (steps / 12) + (steps / 12) + 1);
-	glUniform4f(vertexColorLocation, 1.0f, 0.8f, 0.0f, 1.0f);
-	glDrawElements(GL_TRIANGLES, change - ((steps + 1) * 3 - change), GL_UNSIGNED_INT, (void*)(((steps + 1) * 3 - change) * sizeof(float)));
-
-	for (int i = 0; i < (steps / 2 - 2); i++)
-		glDrawElements(GL_TRIANGLES, (change - ((steps + 1) * 3 - change)) * 2, GL_UNSIGNED_INT, (void*)((((steps + 1) * 6 - change * 2) + (steps + 1) * 3 + (steps + 1) * 6 * i) * sizeof(float)));
-
-	glDrawElements(GL_TRIANGLES, change - ((steps + 1) * 3 - change), GL_UNSIGNED_INT, (void*)((((steps + 1) * 3 - change) + (steps + 1) * 3 + (steps + 1) * 6 * (steps / 2 - 2)) * sizeof(float)));
-
-	glUniform4f(vertexColorLocation, 0.0f, 0.0f, 0.0f, 1.0f);
-	for (int i = 0; i < steps / 2; i++)
-	{
-		glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, (void*)(((steps + 1) * (steps / 2 - 1) * 6 + i * (steps + 1) * 3 + (steps + 1) * 3 - change) * sizeof(float)));
-		glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, (void*)(((steps + 1) * (steps / 2 - 1) * 6 + i * (steps + 1) * 3 + change) * sizeof(float)));
-	}
-}
 
 void updateInput(GLFWwindow * window, glm::vec3& position, glm::vec3& rotation, glm::vec3& scale)
 {
@@ -313,32 +198,6 @@ void updateInput(GLFWwindow * window, glm::vec3& position, glm::vec3& rotation, 
 		position.z += 0.001f;
 	}
 }
-
-void create_food()
-{
-
-}
-void draw_food()
-{
-
-}
-void create_berry()
-{
-
-}
-void draw_berry()
-{
-
-}
-void create_ghost()
-{
-
-}
-void draw_ghost()
-{
-
-}
-
 void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 {
     // make sure the viewport matches the new window dimensions; note that width and 
