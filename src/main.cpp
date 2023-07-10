@@ -4,7 +4,11 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
-#include <Shader.h>
+#include "Shader.h"
+#include "VAO.h"
+#include "VBO.h"
+#include "EBO.h"
+#include "Pacman.h"
 
 const char * vertex_shader_file = "C:\\7mo Semestre\\Computacion Grafica\\TrabajoFinal\\src\\shader.vert";
 const char * fragment_shader_file = "C:\\7mo Semestre\\Computacion Grafica\\TrabajoFinal\\src\\shader.frag";
@@ -69,43 +73,28 @@ int main()
 	int vert_pos = 0; // Posicion del nuevo vertice a colocar para el arreglo, como solo tenemos al pacman es 0
 	int index_pos = 0; // Lo mismo pero con los indices
 
-	create_pacman(vertices, indices, vert_pos, index_pos, steps, radius);
+	Pacman pacman(100000,100000,0.3,70);
+	pacman.createPacman(vert_pos,index_pos);
 	// Al terminar esta funcion, actualiza los nuevos valores de vertpos e indexpos para colocar otros vertices e indices
 
 
 	// Create reference containers for the Vartex Array Object, the Vertex Buffer Object, and the Element Buffer Object
-	GLuint VAO, VBO, EBO;
+	//GLuint VAO, VBO, EBO;
+	VAO VAO1;
+	VAO1.Bind();
 
-	// Generate the VAO, VBO, and EBO with only 1 object each
-	glGenVertexArrays(1, &VAO);
-	glGenBuffers(1, &VBO);
-	glGenBuffers(1, &EBO);
-
-	// Make the VAO the current Vertex Array Object by binding it
-	glBindVertexArray(VAO);
-
-	// Bind the VBO specifying it's a GL_ARRAY_BUFFER
-	glBindBuffer(GL_ARRAY_BUFFER, VBO);
-	// Introduce the vertices into the VBO
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-
-	// Bind the EBO specifying it's a GL_ELEMENT_ARRAY_BUFFER
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-	// Introduce the indices into the EBO
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
-
-	// Configure the Vertex Attribute so that OpenGL knows how to read the VBO
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
-	// Enable the Vertex Attribute so that OpenGL knows to use it
-	glEnableVertexAttribArray(0);
-
-	// Bind both the VBO and VAO to 0 so that we don't accidentally modify the VAO and VBO we created
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-	glBindVertexArray(0);
-	// Bind the EBO to 0 so that we don't accidentally modify it
-	// MAKE SURE TO UNBIND IT AFTER UNBINDING THE VAO, as the EBO is linked in the VAO
-	// This does not apply to the VBO because the VBO is already linked to the VAO during glVertexAttribPointer
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+	VBO VBO1(pacman.vertices, pacman.getSizeV() * sizeof(GL_FLOAT));
+	// Generates Element Buffer Object and links it to indices
+	EBO EBO1(pacman.indices,  pacman.getSizeI() * sizeof(GL_FLOAT));
+     
+	// Links VBO attributes such as coordinates and colors to VAO
+	
+	VAO1.LinkAttrib(VBO1, 0, 3, GL_FLOAT, 3 * sizeof(float), (void*)0);
+	
+	// Unbind all to prevent accidentally modifying them
+	VAO1.Unbind();
+	VBO1.Unbind();
+	EBO1.Unbind();
 
 
 	glm::vec3 position(0.f);
@@ -157,11 +146,10 @@ int main()
         // draw our first triangle
         ourShader.use();
 		
-        glBindVertexArray(VAO); // seeing as we only have a single VAO there's no need to bind it every time, but we'll do so to keep things a bit more organized
-		// Draw primitives, number of indices, datatype of indices, index of indices
+		VAO1.Bind();		// Draw primitives, number of indices, datatype of indices, index of indices
 
 		// Dibujando el pacman
-		draw_pacman(steps, ourShader.ID);
+		pacman.draw(ourShader);
 		
 		// Swap the back buffer with the front buffer
 		glfwSwapBuffers(window);
@@ -170,9 +158,9 @@ int main()
 	}
 
 	// Delete all the objects we've created
-	glDeleteVertexArrays(1, &VAO);
-	glDeleteBuffers(1, &VBO);
-	glDeleteBuffers(1, &EBO);
+	VAO1.Delete();
+	VBO1.Delete();
+	EBO1.Delete();
 
 	ourShader.Delete();
 	
