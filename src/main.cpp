@@ -11,9 +11,6 @@
 #include <glm/gtc/type_ptr.hpp>
 
 #include "Shader.h"
-#include "VAO.h"
-#include "VBO.h"
-#include "EBO.h"
 #include "Pacman.h"
 #include "Food.h"
 
@@ -76,9 +73,10 @@ int main()
 
 	int sizeArr = 4;
 	std::vector<Food*> balls;
-	for (int i = 0; i < sizeArr ;i++) {
-		Food * ball1 = new Food(radiusB,20);
-    	balls.push_back(ball1);
+	for (int i = 0; i < sizeArr ;i++)
+	{
+		Food * ball = new Food(radiusB,20);
+    	balls.push_back(ball);
 		std::cout<<balls.size();
 	}
 
@@ -86,6 +84,8 @@ int main()
 	// Main while loop
 	while (!glfwWindowShouldClose(window))
 	{
+		// Take care of all GLFW events
+		glfwPollEvents();
 		// Specify the color of the background
 		glClearColor(0.07f, 0.13f, 0.17f, 1.0f);
 		// Clean the back buffer and assign the new color to it
@@ -117,8 +117,6 @@ int main()
 		
 		// Swap the back buffer with the front buffer
 		glfwSwapBuffers(window);
-		// Take care of all GLFW events
-		glfwPollEvents();
 	}
 
 	ourShader.Delete();
