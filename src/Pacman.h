@@ -9,6 +9,7 @@
 #include <iostream>
 #include <cerrno>
 #include <vector>
+#include <random>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <GLFW/glfw3.h>
@@ -166,11 +167,11 @@ public:
 		}
 		if (glfwGetKey(window,GLFW_KEY_A) == GLFW_PRESS)
 		{
-			position.x += 0.001f;
+			position.x -= 0.001f;
 		}
 		if (glfwGetKey(window,GLFW_KEY_D) == GLFW_PRESS)
 		{
-			position.x -= 0.001f;
+			position.x += 0.001f;
 		}
 		if (glfwGetKey(window,GLFW_KEY_W) == GLFW_PRESS)
 		{
@@ -180,12 +181,20 @@ public:
 		{
 			position.z += 0.001f;
 		}
+		if (glfwGetKey(window,GLFW_KEY_T) == GLFW_PRESS)
+		{
+			position.y += 0.001f;
+		}
+		if (glfwGetKey(window,GLFW_KEY_G) == GLFW_PRESS)
+		{
+			position.y -= 0.001f;
+		}
 	}
      void draw(Shader &shaderProgram)
 	 {
 		shaderProgram.use();
 
-         // create transformations
+        // create transformations
 		glm::mat4 model = glm::mat4(1.0f);
 		model = glm::translate(model, position);
 		model = glm::rotate(model, glm::radians(rotation.x), glm::vec3(1.0f, 0.0f, 0.0f));
