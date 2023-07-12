@@ -1,14 +1,21 @@
 #include <iostream>
+#include <random>
+#include <vector>
+#include <cmath>
+#include <time.h>
+
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
+
 #include "Shader.h"
 #include "VAO.h"
 #include "VBO.h"
 #include "EBO.h"
 #include "Pacman.h"
+#include "Food.h"
 
 const char * vertex_shader_file = "C:\\7mo Semestre\\Computacion Grafica\\TrabajoFinal\\src\\shader.vert";
 const char * fragment_shader_file = "C:\\7mo Semestre\\Computacion Grafica\\TrabajoFinal\\src\\shader.frag";
@@ -18,6 +25,14 @@ const unsigned int SCR_HEIGHT = 800;
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void updateInput(GLFWwindow * window, glm::vec3& position, glm::vec3& rotation, glm::vec3& scale);
+
+double calculateDistance(double x1, double y1, double z1, double x2, double y2, double z2) {
+    double deltaX = x2 - x1;
+    double deltaY = y2 - y1;
+    double deltaZ = z2 - z1;
+    double distance = std::sqrt((deltaX * deltaX) + (deltaY * deltaY )+ (deltaZ * deltaZ));
+    return distance;
+}
 
 int main()
 {
@@ -54,46 +69,86 @@ int main()
 
 	Shader ourShader(vertex_shader_file, fragment_shader_file);
 
-	int steps = 30;	// La cantidad de lineas para hacer la figura semejante al circulo que ira rotando, por conveniencia que sea un numero par
-	double radius = 0.5; // ancho del pacman en terminos de la contextura de la ventana, siempre es positivo
-	int vert_pos = 0; // Posicion del nuevo vertice a colocar para el arreglo, como solo tenemos al pacman es 0
-	int index_pos = 0; // Lo mismo pero con los indices
+	int steps = 70;	// La cantidad de lineas para hacer la figura semejante al circulo que ira rotando, por conveniencia que sea un numero par
+	double radiusP = 0.4; // ancho del pacman en terminos de la contextura de la ventana, siempre es positivo
+	
 
-	Pacman pacman(100000,100000,0.3,70);
-	pacman.createPacman(vert_pos,index_pos);
+	double radiusB = 0.15;
+
+	Pacman pacman(radiusP,40);
+
+
+/*
+	int sizeArr = 4;
+	std::vector<Food> balls;
+	balls.reserve(sizeArr);
+	for (int i = 0; i < sizeArr ;i++) {
+		Food ball1(30000,50000,radiusB,20);
+		int vert_pos1 = 0; 
+		int index_pos1 = 0;
+		ball1.createFood(vert_pos1, index_pos1);
+    	balls.push_back(ball1);
+		std::cout<<balls.size();
+	}
+
+	// Create and initialize the balls vector here
+	std::vector<VAO> ballVAOs;
+	std::vector<VBO> ballVBOs;
+	std::vector<EBO> ballEBOs;
+	for (int i = 0; i < sizeArr ;i++) 
+	{
+
+		VAO ballVAO;
+
+		// Generate sphere vertices and indices for the ball
+		
+		ballVAO.Bind();
+		VBO ballVBO(balls[i].vertices, balls[i].getSizeV() * sizeof(GL_FLOAT));
+
+		EBO ballEBO(balls[i].indices,  balls[i].getSizeI() * sizeof(GL_UNSIGNED_INT));
+		ballVAO.LinkAttrib(ballVBO, 0, 3, GL_FLOAT, 3 * sizeof(float), (void*)0);
+
+
+		// Set the vertex attribute pointers for the VAO
+
+		// Unbind the VAO, VBO, and EBO
+		ballVAO.Unbind();
+		ballVBO.Unbind();
+		ballEBO.Unbind();
+
+		// Add the VAO, VBO, and EBO to their respective vectors
+		ballVAOs.push_back(ballVAO);
+		ballVBOs.push_back(ballVBO);
+		ballEBOs.push_back(ballEBO);
+	}
+	//create_pacman(vertices, 10000, indices, 21942, vert_pos, index_pos, steps, radius);
 	// Al terminar esta funcion, actualiza los nuevos valores de vertpos e indexpos para colocar otros vertices e indices
 
 
 	// Create reference containers for the Vartex Array Object, the Vertex Buffer Object, and the Element Buffer Object
-	//GLuint VAO, VBO, EBO;
-	VAO VAO1;
-	VAO1.Bind();
-
-	VBO VBO1(pacman.vertices, pacman.getSizeV() * sizeof(GL_FLOAT));
-	// Generates Element Buffer Object and links it to indices
-	EBO EBO1(pacman.indices,  pacman.getSizeI() * sizeof(GL_FLOAT));
-     
-	// Links VBO attributes such as coordinates and colors to VAO
-	
-	VAO1.LinkAttrib(VBO1, 0, 3, GL_FLOAT, 3 * sizeof(float), (void*)0);
-	
-	// Unbind all to prevent accidentally modifying them
-	VAO1.Unbind();
-	VBO1.Unbind();
-	EBO1.Unbind();
-
-	glm::vec3 position(0.f);
-	glm::vec3 rotation(0.f);
-	glm::vec3 scale(1.f);
-
-	rotation.x = 90.f;
+	std::srand(time(NULL));
+	 std::random_device rd;
+    std::mt19937 gen(rd());
+    
+    // Create a uniform real distribution
+    std::uniform_real_distribution<float> dis(0.0, 1.0);
+	std::vector<glm::mat4> translations;
+	for(int i = 0;i<sizeArr;i++){
+		float randomNum = dis(gen);
+		std::cout<<randomNum<<std::endl;
+		translations.push_back(glm::translate(glm::mat4(1.0f), glm::vec3(randomNum, randomNum, 0)));
+		balls[i].center_x = randomNum;
+		balls[i].center_y =  randomNum;
+		balls[i].center_z = 0;
+	}
+*/
+	pacman.rotation.x = 90.f;
 	glm::mat4 model = glm::mat4(1.0f);
-	model = glm::translate(model, position);
-	model = glm::rotate(model, glm::radians(rotation.x), glm::vec3(1.0f, 0.0f, 0.0f));
-	model = glm::rotate(model, glm::radians(rotation.y), glm::vec3(0.0f, 1.0f, 0.0f));
-	model = glm::rotate(model, glm::radians(rotation.z), glm::vec3(0.0f, 0.0f, 1.0f));
-	model = glm::scale(model, scale);
-
+	model = glm::translate(model, pacman.position);
+	model = glm::rotate(model, glm::radians(pacman.rotation.x), glm::vec3(1.0f, 0.0f, 0.0f));
+	model = glm::rotate(model, glm::radians(pacman.rotation.y), glm::vec3(0.0f, 1.0f, 0.0f));
+	model = glm::rotate(model, glm::radians(pacman.rotation.z), glm::vec3(0.0f, 0.0f, 1.0f));
+	model = glm::scale(model, pacman.scale);
 	// Main while loop
 	while (!glfwWindowShouldClose(window))
 	{
@@ -104,47 +159,54 @@ int main()
 		// Tell OpenGL which Shader Program we want to use
 		ourShader.use();
 		// Bind the VAO so OpenGL knows to use it
-		VAO1.Bind();		// Draw primitives, number of indices, datatype of indices, index of indices
 
-        ourShader.setFloat4("ourColor", 1.0f, 0.0f, 0.0f, 1.0f);
+  
 
-        updateInput(window, position, rotation, scale);
-
-         // create transformations
-		model = glm::mat4(1.0f);
-		model = glm::translate(model, position);
-		model = glm::rotate(model, glm::radians(rotation.x), glm::vec3(1.0f, 0.0f, 0.0f));
-		model = glm::rotate(model, glm::radians(rotation.y), glm::vec3(0.0f, 1.0f, 0.0f));
-		model = glm::rotate(model, glm::radians(rotation.z), glm::vec3(0.0f, 0.0f, 1.0f));
-		model = glm::scale(model, scale);
-
-        ourShader.setMat4("model", model);
-
-		glm::mat4 view = glm::mat4(1.0f);
-		view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f)); 
-        ourShader.setMat4("view", view);
-
-		glm::mat4 projection;
-		projection = glm::perspective(glm::radians(45.0f), 800.0f / 800.0f, 0.1f, 100.0f);
-		ourShader.setMat4("projection", projection);
-	
-        // draw our first triangle
-        ourShader.use();
-		
+		pacman.updateInput(window);
 		// Dibujando el pacman
 		pacman.draw(ourShader);
+
+/*
+		for (int i = 0; i < sizeArr; i++) {
+			ballVAOs[i].Bind();
+				glm::mat4 transform3 = glm::translate(translations[i], glm::vec3(0.0f, 0.f, 0.0f));
+		 	 	unsigned int transformLoc2 = glGetUniformLocation(ourShader.ID, "model");
+        		glUniformMatrix4fv(transformLoc2, 1, GL_FALSE, glm::value_ptr(transform3));
+			
 		
+			// Render the ball
+			if(!balls[i].isEaten){
+				double dist = calculateDistance(balls[i].center_x,balls[i].center_y,balls[i].center_z,pacman.center_x,pacman.center_y,pacman.center_z);
+				if(dist>=radiusB+radiusP){
+					
+					balls[i].draw(ourShader);
+				}else{
+						std::cout<<"COLISION"<<std::endl;
+				}
+			}
+				ballVAOs[i].Unbind();
+
+			
+			
+	}
+		*/
 		// Swap the back buffer with the front buffer
 		glfwSwapBuffers(window);
 		// Take care of all GLFW events
 		glfwPollEvents();
 	}
 
-	// Delete all the objects we've created
-	VAO1.Delete();
-	VBO1.Delete();
-	EBO1.Delete();
-
+/*
+	for(auto& vaos:ballVAOs){
+		vaos.Delete();
+	}
+	for(auto& vaos:ballVBOs){
+		vaos.Delete();
+	}
+	for(auto& vaos:ballEBOs){
+		vaos.Delete();
+	}
+*/
 	ourShader.Delete();
 	
 	// Delete window before ending the program
@@ -155,49 +217,6 @@ int main()
 }
 
 
-void updateInput(GLFWwindow * window, glm::vec3& position, glm::vec3& rotation, glm::vec3& scale)
-{
-	if (glfwGetKey(window,GLFW_KEY_UP) == GLFW_PRESS)
-	{
-		rotation.y += 0.1f;
-	}
-	if (glfwGetKey(window,GLFW_KEY_DOWN) == GLFW_PRESS)
-	{
-		rotation.y -= 0.1f;
-	}
-	if (glfwGetKey(window,GLFW_KEY_RIGHT) == GLFW_PRESS)
-	{
-		rotation.x += 0.1f;
-	}
-	if (glfwGetKey(window,GLFW_KEY_LEFT) == GLFW_PRESS)
-	{
-		rotation.x -= 0.1f;
-	}
-	if (glfwGetKey(window,GLFW_KEY_F) == GLFW_PRESS)
-	{
-		rotation.z += 0.1f;
-	}
-	if (glfwGetKey(window,GLFW_KEY_G) == GLFW_PRESS)
-	{
-		rotation.z -= 0.1f;
-	}
-	if (glfwGetKey(window,GLFW_KEY_A) == GLFW_PRESS)
-	{
-		position.x += 0.001f;
-	}
-	if (glfwGetKey(window,GLFW_KEY_D) == GLFW_PRESS)
-	{
-		position.x -= 0.001f;
-	}
-	if (glfwGetKey(window,GLFW_KEY_W) == GLFW_PRESS)
-	{
-		position.z -= 0.001f;
-	}
-	if (glfwGetKey(window,GLFW_KEY_S) == GLFW_PRESS)
-	{
-		position.z += 0.001f;
-	}
-}
 void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 {
     // make sure the viewport matches the new window dimensions; note that width and 
