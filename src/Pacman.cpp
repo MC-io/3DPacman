@@ -45,9 +45,9 @@ Pacman::Pacman(double radius_, int steps_)
 
     for (int i = 0; i <= steps; i++)
     {
-        indices[i] = 0;
-        indices[i] = i + 1;  
-        indices[i] = i + 2;
+        indices[i * 3] = 0;
+        indices[i * 3 + 1] = i + 1;  
+        indices[i * 3 + 2] = i + 2;
 
         indices[((steps + 1) * (steps / 2 - 1) * 6) + i * 3] = (steps + 1) * (steps / 2 - 1) + 2;
         indices[((steps + 1) * (steps / 2 - 1) * 6) + i * 3 + 1] =  i + 1;
@@ -139,26 +139,45 @@ void Pacman::updateInput(GLFWwindow * window)
     if (glfwGetKey(window,GLFW_KEY_A) == GLFW_PRESS)
     {
         position.x -= 0.001f;
+        rotation.x = 90.f;
+        rotation.y = 0.f;
+        rotation.z = 180.f;
     }
     if (glfwGetKey(window,GLFW_KEY_D) == GLFW_PRESS)
     {
         position.x += 0.001f;
+        rotation.x = 90.f;
+        rotation.y = 0.f;
+        rotation.z = 0.f;
     }
     if (glfwGetKey(window,GLFW_KEY_W) == GLFW_PRESS)
     {
         position.z -= 0.001f;
+        rotation.x = 90.f;
+        rotation.y = 0.f;
+        rotation.z = -90.f;
     }
     if (glfwGetKey(window,GLFW_KEY_S) == GLFW_PRESS)
     {
         position.z += 0.001f;
+        rotation.x = 90.f;
+        rotation.y = 0.f;
+        rotation.z = 90.f;
     }
     if (glfwGetKey(window,GLFW_KEY_Y) == GLFW_PRESS)
     {
         position.y += 0.001f;
+        rotation.x = 90.f;
+        rotation.y = 90.f;
+        rotation.z = 0.f;
+
     }
     if (glfwGetKey(window,GLFW_KEY_H) == GLFW_PRESS)
     {
         position.y -= 0.001f;
+        rotation.x = 90.f;
+        rotation.y = -90.f;
+        rotation.z = 0.f;
     }
 }
 void Pacman::draw(Shader &shaderProgram)

@@ -94,7 +94,7 @@ int main()
 		ourShader.use();
 
 		pacman.updateInput(window);
-		// Dibujando el pacman
+		// Rendering pacman
 		pacman.draw(ourShader);
 
 		for (int i = 0; i < sizeArr; i++) 

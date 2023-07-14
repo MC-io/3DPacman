@@ -50,9 +50,9 @@ Food::Food(double radius_, int steps_)
 
     for (int i = 0; i <= steps; i++)
     {
-        indices[i] = 0;
-        indices[i] = i + 1;  
-        indices[i] = i + 2;
+        indices[i * 3] = 0;
+        indices[i * 3 + 1] = i + 1;  
+        indices[i * 3 + 2] = i + 2;
 
         indices[((steps + 1) * (steps / 2 - 1) * 6) + i * 3] = (steps + 1) * (steps / 2 - 1) + 2;
         indices[((steps + 1) * (steps / 2 - 1) * 6) + i * 3 + 1] =  i + 1;
