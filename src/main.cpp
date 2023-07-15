@@ -13,6 +13,7 @@
 #include "Shader.h"
 #include "Pacman.h"
 #include "Food.h"
+#include "Camera.h"
 
 const char * vertex_shader_file = "C:\\7mo Semestre\\Computacion Grafica\\TrabajoFinal\\src\\shader.vert";
 const char * fragment_shader_file = "C:\\7mo Semestre\\Computacion Grafica\\TrabajoFinal\\src\\shader.frag";
@@ -21,14 +22,7 @@ const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 800;
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
-
-double calculate_distance(double x1, double y1, double z1, double x2, double y2, double z2) {
-    double deltaX = x2 - x1;
-    double deltaY = y2 - y1;
-    double deltaZ = z2 - z1;
-    double distance = std::sqrt((deltaX * deltaX) + (deltaY * deltaY )+ (deltaZ * deltaZ));
-    return distance;
-}
+double calculate_distance(double x1, double y1, double z1, double x2, double y2, double z2);
 
 int main()
 {
@@ -71,16 +65,28 @@ int main()
 
 	Pacman pacman(radiusP,40);
 
-	int sizeArr = 4;
+	int sizeArr = 8;
+	std::vector<glm::vec3> ball_positions = {glm::vec3(-0.3f, 0.4f, 0.0f), 
+											glm::vec3(-0.1f, 0.6f, 0.0f),
+											glm::vec3(0.3f, -0.6f, 0.0f),
+											glm::vec3(0.2f, 0.9f, 0.0f),
+											glm::vec3(-0.8f, -0.7f, 0.0f),
+											glm::vec3(-0.2f, -0.4f, 0.0f),
+											glm::vec3(-0.1f, -0.9f, 0.0f),
+											glm::vec3(-0.2f, 0.5, 0.0f)};
+
 	std::vector<Food*> balls;
 	for (int i = 0; i < sizeArr ;i++)
 	{
 		Food * ball = new Food(radiusB,20);
     	balls.push_back(ball);
-		std::cout<<balls.size();
+		balls[i]->position = ball_positions[i];
 	}
 
 	pacman.rotation.x = 90.f;
+
+	Camera camera(SCR_WIDTH, SCR_HEIGHT, glm::vec3(0.0f, 0.0f, 3.f));
+	
 	// Main while loop
 	while (!glfwWindowShouldClose(window))
 	{
@@ -92,6 +98,10 @@ int main()
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 		// Tell OpenGL which Shader Program we want to use
 		ourShader.use();
+
+		camera.process_input(window);
+		camera.updateMatrix(45.f, 0.1f, 100.f);
+		camera.Matrix(ourShader, "camMatrix");
 
 		pacman.updateInput(window);
 		// Rendering pacman
@@ -128,6 +138,14 @@ int main()
 	return 0;
 }
 
+
+double calculate_distance(double x1, double y1, double z1, double x2, double y2, double z2) {
+    double deltaX = x2 - x1;
+    double deltaY = y2 - y1;
+    double deltaZ = z2 - z1;
+    double distance = std::sqrt((deltaX * deltaX) + (deltaY * deltaY )+ (deltaZ * deltaZ));
+    return distance;
+}
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 {

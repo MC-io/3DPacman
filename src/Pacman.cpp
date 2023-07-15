@@ -143,28 +143,28 @@ void Pacman::updateInput(GLFWwindow * window)
         rotation.y = 0.f;
         rotation.z = 180.f;
     }
-    if (glfwGetKey(window,GLFW_KEY_D) == GLFW_PRESS)
+    else if (glfwGetKey(window,GLFW_KEY_D) == GLFW_PRESS)
     {
         position.x += 0.001f;
         rotation.x = 90.f;
         rotation.y = 0.f;
         rotation.z = 0.f;
     }
-    if (glfwGetKey(window,GLFW_KEY_W) == GLFW_PRESS)
+    else if (glfwGetKey(window,GLFW_KEY_Y) == GLFW_PRESS)
     {
         position.z -= 0.001f;
         rotation.x = 90.f;
         rotation.y = 0.f;
         rotation.z = -90.f;
     }
-    if (glfwGetKey(window,GLFW_KEY_S) == GLFW_PRESS)
+    else if (glfwGetKey(window,GLFW_KEY_H) == GLFW_PRESS)
     {
         position.z += 0.001f;
         rotation.x = 90.f;
         rotation.y = 0.f;
         rotation.z = 90.f;
     }
-    if (glfwGetKey(window,GLFW_KEY_Y) == GLFW_PRESS)
+    else if (glfwGetKey(window,GLFW_KEY_W) == GLFW_PRESS)
     {
         position.y += 0.001f;
         rotation.x = 90.f;
@@ -172,7 +172,7 @@ void Pacman::updateInput(GLFWwindow * window)
         rotation.z = 0.f;
 
     }
-    if (glfwGetKey(window,GLFW_KEY_H) == GLFW_PRESS)
+    else if (glfwGetKey(window,GLFW_KEY_S) == GLFW_PRESS)
     {
         position.y -= 0.001f;
         rotation.x = 90.f;
@@ -193,14 +193,6 @@ void Pacman::draw(Shader &shaderProgram)
     model = glm::scale(model, scale);
 
     shaderProgram.setMat4("model", model);
-
-    glm::mat4 view = glm::mat4(1.0f);
-    view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f)); 
-    shaderProgram.setMat4("view", view);
-
-    glm::mat4 projection;
-    projection = glm::perspective(glm::radians(45.0f), 800.0f / 800.0f, 0.1f, 100.0f);
-    shaderProgram.setMat4("projection", projection);
 
     vao.Bind();
 

@@ -2,10 +2,6 @@
 
 Food::Food(double radius_, int steps_)
 {
-    std::random_device dev;
-    std::mt19937 rng(dev());
-    std::uniform_int_distribution<std::mt19937::result_type> dist6(-500,1000); 
-
     this->radius = radius_;
     this->steps = steps_;
     this->vertices.resize((steps + 1) * (steps / 2 - 1) + 3);
@@ -103,11 +99,6 @@ Food::Food(double radius_, int steps_)
     vbo.Unbind();
     ebo.Unbind();
 
-    float randomNum = dist6(rng) / 1000.f;
-    std::cout<<randomNum<<std::endl;
-    this->position.x = randomNum;
-    this->position.y =  randomNum;
-    this->position.z = 0;
 }
 int Food::get_vertices_size()
 {

@@ -6,7 +6,7 @@ Camera::Camera(int width, int height, glm::vec3 position)
 {
 	Camera::width = width;
 	Camera::height = height;
-	Position = position;
+	this->position = position;
 }
 
 void Camera::updateMatrix(float FOVdeg, float nearPlane, float farPlane)
@@ -16,7 +16,7 @@ void Camera::updateMatrix(float FOVdeg, float nearPlane, float farPlane)
 	glm::mat4 projection = glm::mat4(1.0f);
 
 	// Makes camera look in the right direction from the right position
-	view = glm::lookAt(Position, Position + Orientation, Up);
+	view = glm::lookAt(this->position, this->position + this->orientation, this->up);
 	// Adds perspective to the scene
 	projection = glm::perspective(glm::radians(FOVdeg), (float)width / height, nearPlane, farPlane);
 
@@ -28,4 +28,18 @@ void Camera::Matrix(Shader& shader, const char* uniform)
 {
 	// Exports camera matrix
 	glUniformMatrix4fv(glGetUniformLocation(shader.ID, uniform), 1, GL_FALSE, glm::value_ptr(cameraMatrix));
+}
+
+void Camera::process_input(GLFWwindow * window)
+{
+	/*
+	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+        this->position += this->speed * this->orientation;
+    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+        this->position -= this->speed * this->orientation;
+    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+        this->position -= glm::normalize(glm::cross(this->orientation, this->up)) * this->speed;
+    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+        this->position += glm::normalize(glm::cross(this->orientation, this->up)) * this->speed;
+		*/
 }
