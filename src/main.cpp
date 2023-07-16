@@ -14,6 +14,7 @@
 #include "Pacman.h"
 #include "Food.h"
 #include "Camera.h"
+#include "Ghost.h"
 
 const char * vertex_shader_file = "C:\\7mo Semestre\\Computacion Grafica\\TrabajoFinal\\src\\shader.vert";
 const char * fragment_shader_file = "C:\\7mo Semestre\\Computacion Grafica\\TrabajoFinal\\src\\shader.frag";
@@ -86,6 +87,11 @@ int main()
 	pacman.rotation.x = 90.f;
 
 	Camera camera(SCR_WIDTH, SCR_HEIGHT, glm::vec3(0.0f, 0.0f, 3.f));
+	Ghost ghost(0.18f, 22);
+
+	ghost.rotation.x = 180.f;
+
+	ghost.position = glm::vec3(-0.7f,-0.7f, 0.0f);
 	
 	// Main while loop
 	while (!glfwWindowShouldClose(window))
@@ -106,6 +112,7 @@ int main()
 		pacman.updateInput(window);
 		// Rendering pacman
 		pacman.draw(ourShader);
+		ghost.draw(ourShader);
 
 		for (int i = 0; i < sizeArr; i++) 
 		{
