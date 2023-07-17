@@ -15,7 +15,7 @@ public:
     bool game_over;
 
 
-    Level(glm::vec3 start_pos, std::vector<std::vector<int>> matrix, std::vector<glm::vec3> food_pos);
+    Level(glm::vec3 start_pos, std::vector<std::string> matrix, std::vector<glm::vec3> food_pos);
     void render_level();
 
 };

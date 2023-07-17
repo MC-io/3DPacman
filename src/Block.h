@@ -1,5 +1,5 @@
-#ifndef _MAZE_H_
-#define _MAZE_H_
+#ifndef _BLOCK_H_
+#define _BLOCK_H_
 
 #include <glm/glm.hpp>
 #include <glad/glad.h>
@@ -16,21 +16,22 @@
 #include "Shader.h"
 #include "VAO.h"
 #include "EBO.h"
-#include "StraightBlock.h"
-#include "CornerBlock.h"
 
-class Maze
+class Block
 {
-private:
-
+protected:
+    double size;
 public:
-    std::vector<std::string> matrix;
-    std::vector<Block*> blocks;
-    double map_size;
+    std::vector<Vertex> vertices;
+    std::vector<GLuint> indices;
 
-    void draw(Shader &shader);
-    Maze(std::vector<std::string> matrix_, double map_size);
+	VAO vao;
 
+	glm::vec3 position;
+	glm::vec3 rotation;
+	glm::vec3 scale;
+
+    virtual void draw(Shader &shaderProgram);
 };
 
 #endif

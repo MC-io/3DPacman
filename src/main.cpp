@@ -15,6 +15,9 @@
 #include "Food.h"
 #include "Camera.h"
 #include "Ghost.h"
+#include "StraightBlock.h"
+#include "CornerBlock.h"
+#include "Maze.h"
 
 const char * vertex_shader_file = "C:\\7mo Semestre\\Computacion Grafica\\TrabajoFinal\\src\\shader.vert";
 const char * fragment_shader_file = "C:\\7mo Semestre\\Computacion Grafica\\TrabajoFinal\\src\\shader.frag";
@@ -66,6 +69,7 @@ int main()
 
 	Pacman pacman(radiusP,40);
 
+
 	int sizeArr = 8;
 	std::vector<glm::vec3> ball_positions = {glm::vec3(-0.3f, 0.4f, 0.0f), 
 											glm::vec3(-0.1f, 0.6f, 0.0f),
@@ -88,6 +92,26 @@ int main()
 
 	Camera camera(SCR_WIDTH, SCR_HEIGHT, glm::vec3(0.0f, 0.0f, 3.f));
 	Ghost ghost(0.18f, 22);
+	
+	std::vector<std::string> matrix =
+	{{"b----------a"},
+	 {"| b-- --a  |"},
+	 {"| |     c- |"},
+	 {"| | |      |"},
+	 {"| | |      |"},
+	 {"| | |      |"},
+	 {"| |        |"},
+	 {"| |        |"},
+	 {"|          |"},
+	 {"|          |"},
+	 {"c----------d"},
+	};
+	Maze map(matrix, 0.3f);
+	
+
+	//bloque.rotation.x = 90.f;
+
+
 
 	ghost.rotation.x = 180.f;
 
@@ -113,6 +137,7 @@ int main()
 		// Rendering pacman
 		pacman.draw(ourShader);
 		ghost.draw(ourShader);
+		map.draw(ourShader);
 
 		for (int i = 0; i < sizeArr; i++) 
 		{

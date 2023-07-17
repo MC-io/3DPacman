@@ -32,14 +32,13 @@ void Camera::Matrix(Shader& shader, const char* uniform)
 
 void Camera::process_input(GLFWwindow * window)
 {
-	/*
-	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-        this->position += this->speed * this->orientation;
-    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-        this->position -= this->speed * this->orientation;
-    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-        this->position -= glm::normalize(glm::cross(this->orientation, this->up)) * this->speed;
-    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-        this->position += glm::normalize(glm::cross(this->orientation, this->up)) * this->speed;
-		*/
+	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+        this->position.x -= this->speed;
+    else if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+        this->position.x += this->speed;
+	else if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+        this->position.y += this->speed;
+    else if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+        this->position.y -= this->speed;
+    
 }
