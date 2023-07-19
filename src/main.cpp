@@ -22,6 +22,9 @@
 const char * vertex_shader_file = "C:\\7mo Semestre\\Computacion Grafica\\TrabajoFinal\\src\\shader.vert";
 const char * fragment_shader_file = "C:\\7mo Semestre\\Computacion Grafica\\TrabajoFinal\\src\\shader.frag";
 
+const char * vertex_texshader_file = "C:\\7mo Semestre\\Computacion Grafica\\TrabajoFinal\\src\\texshader.vert";
+const char * fragment_texshader_file = "C:\\7mo Semestre\\Computacion Grafica\\TrabajoFinal\\src\\texshader.frag";
+
 const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 800;
 
@@ -62,6 +65,8 @@ int main()
 	glEnable(GL_DEPTH_TEST);
 
 	Shader ourShader(vertex_shader_file, fragment_shader_file);
+	Shader texShader(vertex_texshader_file, fragment_texshader_file);
+
 
 	int steps = 70;	// La cantidad de lineas para hacer la figura semejante al circulo que ira rotando, por conveniencia que sea un numero par
 	double radiusP = 0.2; // ancho del pacman en terminos de la contextura de la ventana, siempre es positivo
@@ -90,28 +95,50 @@ int main()
 
 	pacman.rotation.x = 90.f;
 
-	Camera camera(SCR_WIDTH, SCR_HEIGHT, glm::vec3(0.0f, 0.0f, 3.f));
+	Camera camera(SCR_WIDTH, SCR_HEIGHT, glm::vec3(0.0f, 2.0f, 3.f));
 	Ghost ghost(0.18f, 22);
 	
 	std::vector<std::string> matrix =
-	{{"b----------a"},
-	 {"| b-- --a  |"},
-	 {"| |     c- |"},
-	 {"| | |      |"},
-	 {"| | |      |"},
-	 {"| | |      |"},
-	 {"| |        |"},
-	 {"| |        |"},
-	 {"|          |"},
-	 {"|          |"},
-	 {"c----------d"},
+	{{"b---a| |b---a"},
+	 {"|   || ||   |"},
+	 {"| | cd cd | |"},
+	 {"|           |"},
+	 {"| | b-----a |"},
+	 {"| | |b---a| |"},
+	 {"| | ||ba || |"},
+	 {"| | |cd| || |"},
+	 {"| | c--d cd |"},
+	 {"|           |"},
+	 {"|   b---a | |"},
+	 {"c-- |b-a| | |"},
+	 {"|   |c-d| | |"},
+	 {"| | c---d | |"},
+	 {"| |       | |"},
+	 {"| | b---a | |"},
+	 {"| | |b-a| | |"},
+	 {"| | |c-d| | |"},
+	 {"| | c---d | |"},
+	 {"|           |"},
+	 {"|   | b-a | |"},
+	 {"|-  | | | | |"},
+	 {"|  -| | | | |"},
+	 {"|-  | c-d | |"},
+	 {"|           |"},
+	 {"| | b-----a |"},
+	 {"| | c-----d |"},
+	 {"| |         |"},
+	 {"| | b---a | |"},
+	 {"| | |ba | | |"},
+	 {"|   ||| |   |"},
+	 {"| | cdc-d | |"},
+	 {"| |       | |"},
+	 {"|   ba ba   |"},
+	 {"c---d| |c---d"},
 	};
-	Maze map(matrix, 0.3f);
+	std::vector<Texture> textures = { Texture("C:\\7mo Semestre\\Computacion Grafica\\TrabajoFinal\\Textures\\pared.jpg", 0 ,GL_RGB, GL_UNSIGNED_BYTE)};
+
+	Maze map(matrix, 0.3f, textures);
 	
-
-	//bloque.rotation.x = 90.f;
-
-
 
 	ghost.rotation.x = 180.f;
 
@@ -127,17 +154,19 @@ int main()
 		// Clean the back buffer and assign the new color to it
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 		// Tell OpenGL which Shader Program we want to use
-		ourShader.use();
 
 		camera.process_input(window);
 		camera.updateMatrix(45.f, 0.1f, 100.f);
+
 		camera.Matrix(ourShader, "camMatrix");
+		camera.Matrix(texShader, "camMatrix");
+
 
 		pacman.updateInput(window);
 		// Rendering pacman
 		pacman.draw(ourShader);
 		ghost.draw(ourShader);
-		map.draw(ourShader);
+		map.draw(texShader);
 
 		for (int i = 0; i < sizeArr; i++) 
 		{
@@ -162,6 +191,7 @@ int main()
 	}
 
 	ourShader.Delete();
+	texShader.Delete();
 	
 	// Delete window before ending the program
 	glfwDestroyWindow(window);

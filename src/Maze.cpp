@@ -1,9 +1,11 @@
 #include "Maze.h"
 
-Maze::Maze(std::vector<std::string> matrix_, double map_size)
+Maze::Maze(std::vector<std::string> matrix_, double map_size, std::vector<Texture>& texture)
 {
     this->map_size = map_size;
     this->matrix = matrix_;
+    this->texture = texture;
+
     for (int i = 0; i < this->matrix.size(); i++)
     {
         for (int j = 0; j < this->matrix[i].size(); j++)
@@ -34,11 +36,16 @@ Maze::Maze(std::vector<std::string> matrix_, double map_size)
             }
         }
     }
+    std::cout << "XDDD";
+
         
 }
 
 void Maze::draw(Shader &shader)
 {
+    shader.use();
+    texture[0].texUnit(shader, "ourTexture", 0);
+    texture[0].Bind();
     for (int i = 0; i < this->blocks.size(); i++)
     {
         this->blocks[i]->draw(shader);

@@ -18,18 +18,19 @@
 #include "EBO.h"
 #include "StraightBlock.h"
 #include "CornerBlock.h"
-
+#include "Texture.h"
 class Maze
 {
 private:
 
 public:
     std::vector<std::string> matrix;
+    std::vector<Texture> texture;
     std::vector<Block*> blocks;
     double map_size;
 
     void draw(Shader &shader);
-    Maze(std::vector<std::string> matrix_, double map_size);
+    Maze(std::vector<std::string> matrix_, double map_size, std::vector<Texture>& texture);
 
 };
 

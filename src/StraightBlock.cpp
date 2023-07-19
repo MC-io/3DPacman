@@ -22,7 +22,19 @@ StraightBlock::StraightBlock(double size_, float angle, float x, float y)
     this->vertices[4].pos = glm::vec3(size / 4, size, -size); 
     this->vertices[5].pos = glm::vec3(- size / 4, size, -size); 
     this->vertices[6].pos = glm::vec3(size / 4, -size, -size); 
-    this->vertices[7].pos = glm::vec3(-size / 4, -size, -size); 
+    this->vertices[7].pos = glm::vec3(-size / 4, -size, -size);
+
+    for (int i = 0; i < 8; i++)
+    {
+        this->vertices[i].color = glm::vec3(0.0f, 0.0f, 0.0f);
+
+        if (i % 3 == 0)
+            this->vertices[i].tex_coord = glm::vec2(0.0f, 1.0f);
+        else if (i % 3 == 1)
+            this->vertices[i].tex_coord = glm::vec2(1.0f, 1.0f);
+        else
+            this->vertices[i].tex_coord = glm::vec2(1.0f, 0.0f);
+    }
 
     this->indices =
     {
@@ -47,6 +59,8 @@ StraightBlock::StraightBlock(double size_, float angle, float x, float y)
     EBO ebo(indices);
     // Links VBO attributes such as coordinates and colors to VAO
     vao.LinkAttrib(vbo, 0, 3, GL_FLOAT, sizeof(Vertex), (void*)0);
+    vao.LinkAttrib(vbo, 1, 3, GL_FLOAT, sizeof(Vertex), (void*)(3 * sizeof(float)));
+    vao.LinkAttrib(vbo, 2, 2, GL_FLOAT, sizeof(Vertex), (void*)(6 * sizeof(float)));
 
     // Unbind all to prevent accidentally modifying them
     vao.Unbind();

@@ -197,7 +197,7 @@ void Pacman::draw(Shader &shaderProgram)
     vao.Bind();
 
     double  timeValue = glfwGetTime();
-    int change =  (steps + 1) * 3 - 3 * (int)(sin(timeValue * 10) * (steps / 12) + (steps / 12) + 1);
+    int change =  (steps + 1) * 3 - 3 * (int)(sin(timeValue * 20) * (steps / 12) + (steps / 12) + 1);
     shaderProgram.setFloat4("ourColor",  1.0f, 0.8f, 0.0f, 1.0f);
     glDrawElements(GL_TRIANGLES, change - ((steps + 1) * 3 - change), GL_UNSIGNED_INT, (void*)(((steps + 1) * 3 - change) * sizeof(float)));
 

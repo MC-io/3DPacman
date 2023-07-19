@@ -2,7 +2,7 @@
 
 Level::Level(glm::vec3 start_pos, std::vector<std::string> matrix, std::vector<glm::vec3> food_pos)
 {
-    this->map = new Maze(matrix, 0.1);
+    //his->map = new Maze(matrix, 0.1,);
 
     this->pacman = new Pacman(50, 0.4);
     this->pacman->position = start_pos;

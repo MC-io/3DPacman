@@ -16,6 +16,7 @@
 #include "Shader.h"
 #include "VAO.h"
 #include "EBO.h"
+#include <stb_image.h>
 
 class Block
 {
