@@ -11,13 +11,8 @@
 #include <glm/gtc/type_ptr.hpp>
 
 #include "Shader.h"
-#include "Pacman.h"
-#include "Food.h"
 #include "Camera.h"
-#include "Ghost.h"
-#include "StraightBlock.h"
-#include "CornerBlock.h"
-#include "Maze.h"
+#include "Level.h"
 
 const char * vertex_shader_file = "C:\\7mo Semestre\\Computacion Grafica\\TrabajoFinal\\src\\shader.vert";
 const char * fragment_shader_file = "C:\\7mo Semestre\\Computacion Grafica\\TrabajoFinal\\src\\shader.frag";
@@ -67,36 +62,17 @@ int main()
 	Shader ourShader(vertex_shader_file, fragment_shader_file);
 	Shader texShader(vertex_texshader_file, fragment_texshader_file);
 
-
+/*
 	int steps = 70;	// La cantidad de lineas para hacer la figura semejante al circulo que ira rotando, por conveniencia que sea un numero par
-	double radiusP = 0.2; // ancho del pacman en terminos de la contextura de la ventana, siempre es positivo
+	double radiusP = 0.3; // ancho del pacman en terminos de la contextura de la ventana, siempre es positivo
 	double radiusB = 0.05;
 
-	Pacman pacman(radiusP,40);
-
-
-	int sizeArr = 8;
-	std::vector<glm::vec3> ball_positions = {glm::vec3(-0.3f, 0.4f, 0.0f), 
-											glm::vec3(-0.1f, 0.6f, 0.0f),
-											glm::vec3(0.3f, -0.6f, 0.0f),
-											glm::vec3(0.2f, 0.9f, 0.0f),
-											glm::vec3(-0.8f, -0.7f, 0.0f),
-											glm::vec3(-0.2f, -0.4f, 0.0f),
-											glm::vec3(-0.1f, -0.9f, 0.0f),
-											glm::vec3(-0.2f, 0.5, 0.0f)};
-
-	std::vector<Food*> balls;
-	for (int i = 0; i < sizeArr ;i++)
-	{
-		Food * ball = new Food(radiusB,20);
-    	balls.push_back(ball);
-		balls[i]->position = ball_positions[i];
-	}
+	Pacman pacman(0.2,40);
 
 	pacman.rotation.x = 90.f;
-
+*/
 	Camera camera(SCR_WIDTH, SCR_HEIGHT, glm::vec3(0.0f, 2.0f, 3.f));
-	Ghost ghost(0.18f, 22);
+/*	Ghost ghost(0.18f, 22);
 	
 	std::vector<std::string> matrix =
 	{{"b---a| |b---a"},
@@ -134,16 +110,46 @@ int main()
 	 {"| |       | |"},
 	 {"|   ba ba   |"},
 	 {"c---d| |c---d"},
-	};
+	};*/
+
+	std::vector<std::string> matrix =
+	{{"####### ######"},
+	 {"#....##.##...#"},
+	 {"#....##.##...#"},
+	 {"#............#"},
+	 {"#..........#.#"},
+	 {"#..........#.#"},
+	 {"#.....#.####.#"},
+	 {"#..........#.#"},
+	 {"#..........#.#"},
+	 {"##############"},
+	};	
+
+	Level level1(glm::vec3(0.0f, 0.0f, 0.0f), matrix);
+	/*std::vector<Food*> balls;
+	
+	for (int i = 0; i < matrix.size(); i++)
+	{
+		for (int j = 0; j < matrix[i].length(); j++)
+		{
+			if (matrix[i][j] == '.')
+			{
+				balls.push_back(new Food(0.05, 20, j * 0.2f * 2, i * 0.2f * 2));
+			}
+		}
+	}
+
+	int sizeArr = balls.size();
+
 	std::vector<Texture> textures = { Texture("C:\\7mo Semestre\\Computacion Grafica\\TrabajoFinal\\Textures\\pared.jpg", 0 ,GL_RGB, GL_UNSIGNED_BYTE)};
 
-	Maze map(matrix, 0.3f, textures);
+	Maze map(matrix, 0.2f, textures);
 	
 
 	ghost.rotation.x = 180.f;
 
 	ghost.position = glm::vec3(-0.7f,-0.7f, 0.0f);
-	
+	*/
 	// Main while loop
 	while (!glfwWindowShouldClose(window))
 	{
@@ -155,13 +161,9 @@ int main()
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 		// Tell OpenGL which Shader Program we want to use
 
-		camera.process_input(window);
-		camera.updateMatrix(45.f, 0.1f, 100.f);
+		level1.render_level(window, ourShader, texShader, camera);
 
-		camera.Matrix(ourShader, "camMatrix");
-		camera.Matrix(texShader, "camMatrix");
-
-
+/*
 		pacman.updateInput(window);
 		// Rendering pacman
 		pacman.draw(ourShader);
@@ -174,7 +176,7 @@ int main()
 			if (!balls[i]->is_eaten)
 			{
 				double dist = calculate_distance(balls[i]->position.x,balls[i]->position.y,balls[i]->position.z,pacman.position.x,pacman.position.y,pacman.position.z);
-				if (dist >= radiusB + radiusP)
+				if (dist >= 0.25)
 				{
 					balls[i]->draw(ourShader);
 				}
@@ -185,7 +187,7 @@ int main()
 				}
 			}
 		}
-		
+*/		
 		// Swap the back buffer with the front buffer
 		glfwSwapBuffers(window);
 	}

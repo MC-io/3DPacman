@@ -16,8 +16,7 @@
 #include "Shader.h"
 #include "VAO.h"
 #include "EBO.h"
-#include "StraightBlock.h"
-#include "CornerBlock.h"
+#include "Blocc.h"
 #include "Texture.h"
 class Maze
 {
@@ -26,7 +25,7 @@ private:
 public:
     std::vector<std::string> matrix;
     std::vector<Texture> texture;
-    std::vector<Block*> blocks;
+    std::vector<Blocc*> blocks;
     double map_size;
 
     void draw(Shader &shader);

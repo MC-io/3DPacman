@@ -1,5 +1,5 @@
-#ifndef FOOD_CLASS_H
-#define FOOD_CLASS_H
+#ifndef _BLOCC_H_
+#define _BLOCC_H_
 
 #include <glm/glm.hpp>
 #include <glad/glad.h>
@@ -16,12 +16,12 @@
 #include "Shader.h"
 #include "VAO.h"
 #include "EBO.h"
+#include <stb_image.h>
 
-class Food
+class Blocc
 {
-private:
-    int steps;
-    double radius;
+protected:
+    double size;
 public:
     std::vector<Vertex> vertices;
     std::vector<GLuint> indices;
@@ -31,12 +31,8 @@ public:
 	glm::vec3 position;
 	glm::vec3 rotation;
 	glm::vec3 scale;
-
-	bool is_eaten;
-	Food(double radius_, int steps_, float x, float y);
-    int get_vertices_size();
-    int get_indices_size();
-    ~Food();
+    
+    Blocc(double size_, float angle, float x, float y);
     void draw(Shader &shaderProgram);
 };
 

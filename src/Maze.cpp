@@ -10,35 +10,12 @@ Maze::Maze(std::vector<std::string> matrix_, double map_size, std::vector<Textur
     {
         for (int j = 0; j < this->matrix[i].size(); j++)
         {
-            if (this->matrix[i][j] == '|')
+            if (this->matrix[i][j] == '#')
             {
-                this->blocks.push_back(std::move(new StraightBlock(map_size, 90.f, i * map_size * 2, j * map_size * 2)));
-            }
-            else if (this->matrix[i][j] == '-')
-            {
-                this->blocks.push_back(std::move(new StraightBlock(map_size, 0.f, i * map_size * 2, j * map_size * 2)));
-            }
-            else if (this->matrix[i][j] == 'a')
-            {
-                this->blocks.push_back(std::move(new CornerBlock(map_size, 0.f, i * map_size * 2, j * map_size * 2)));
-            }
-            else if (this->matrix[i][j] == 'b')
-            {
-                this->blocks.push_back(std::move(new CornerBlock(map_size, 90.f, i * map_size * 2, j * map_size * 2)));
-            }
-            else if (this->matrix[i][j] == 'c')
-            {
-                this->blocks.push_back(std::move(new CornerBlock(map_size, 180.f, i * map_size * 2, j * map_size * 2)));
-            }
-            else if (this->matrix[i][j] == 'd')
-            {
-                this->blocks.push_back(std::move(new CornerBlock(map_size, -90.f, i * map_size * 2, j * map_size * 2)));
+                this->blocks.push_back(std::move(new Blocc(map_size, 0.f, j * map_size * 2, i * map_size * 2)));
             }
         }
     }
-    std::cout << "XDDD";
-
-        
 }
 
 void Maze::draw(Shader &shader)

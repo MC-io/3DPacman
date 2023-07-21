@@ -1,6 +1,6 @@
 #include "Food.h"
 
-Food::Food(double radius_, int steps_)
+Food::Food(double radius_, int steps_, float x, float y)
 {
     this->radius = radius_;
     this->steps = steps_;
@@ -8,6 +8,9 @@ Food::Food(double radius_, int steps_)
     this->indices.resize(((steps + 1) * (steps / 2 - 1) * 6) + ((steps + 1) * (steps / 2 - 1) * 3) + steps * 3 + 3);
 
     this->position = glm::vec3(0.f);
+    position.x = x;
+    position.y = y;
+
     this->rotation = glm::vec3(0.f);
     this->scale = glm::vec3(1.f);
     
