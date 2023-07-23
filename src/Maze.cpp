@@ -12,7 +12,7 @@ Maze::Maze(std::vector<std::string> matrix_, double map_size, std::vector<Textur
         {
             if (this->matrix[i][j] == '#')
             {
-                this->blocks.push_back(std::move(new Blocc(map_size, 0.f, j * map_size * 2, i * map_size * 2)));
+                this->blocks.push_back(std::move(new Blocc(map_size, 0.f, i * map_size * 2, j * map_size * 2)));
             }
         }
     }

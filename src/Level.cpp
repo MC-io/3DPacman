@@ -15,7 +15,11 @@ Level::Level(glm::vec3 start_pos, std::vector<std::string> matrix)
         {
             if (matrix[i][j] == '.')
             {
-                food_vector.push_back(new Food(0.05, 20, j * map->map_size * 2, i * map->map_size * 2));
+                food_vector.push_back(new Food(0.05, 20, i * map->map_size * 2, j * map->map_size * 2));
+            }
+			else if (matrix[i][j] == '@')
+            {
+                ghosts.push_back(new Ghost(0.15, 18, i * map->map_size * 2, j * map->map_size * 2));
             }
         }
     }
@@ -35,20 +39,26 @@ void Level::render_level(GLFWwindow * window, Shader & color_shader, Shader & te
     this->map->draw(texture_shader);
 
     for (int i = 0; i < food_vector.size(); i++) 
+	{
+		// Render the ball
+		if (!food_vector[i]->is_eaten)
 		{
-			// Render the ball
-			if (!food_vector[i]->is_eaten)
+			double dist = glm::distance(food_vector[i]->position, pacman->position);
+			if (dist >= 0.25)
 			{
-				double dist = glm::distance(food_vector[i]->position, pacman->position);
-				if (dist >= 0.25)
-				{
-					food_vector[i]->draw(color_shader);
-				}
-				else
-				{
-					std::cout << "COLISION" << std::endl;
-					food_vector[i]->is_eaten = true;
-				}
+				food_vector[i]->draw(color_shader);
+			}
+			else
+			{
+				std::cout << "COLISION" << std::endl;
+				food_vector[i]->is_eaten = true;
 			}
 		}
+	}
+
+	for (int i = 0; i < ghosts.size(); i++)
+	{
+		ghosts[i]->move(this->map->matrix, this->map->map_size);
+		ghosts[i]->draw(color_shader);
+	}
 }

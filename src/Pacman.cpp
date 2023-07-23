@@ -5,6 +5,7 @@ Pacman::Pacman(double radius_, int steps_)
 
     this->radius = radius_;
     this->steps = steps_;
+    this->speed = 0.001;
     this->vertices.resize((steps + 1) * (steps / 2 - 1) + 3);
     this->indices.resize(((steps + 1) * (steps / 2 - 1) * 6) + ((steps + 1) * (steps / 2 - 1) * 3) + steps * 3 + 3);
 
@@ -138,46 +139,33 @@ void Pacman::updateInput(GLFWwindow * window)
     }
     if (glfwGetKey(window,GLFW_KEY_A) == GLFW_PRESS)
     {
-        position.x -= 0.001f;
-        rotation.x = 90.f;
-        rotation.y = 0.f;
-        rotation.z = 180.f;
+        position.x -= speed;
+        rotation = glm::vec3(0.f, 0.f, 180.f);
     }
     else if (glfwGetKey(window,GLFW_KEY_D) == GLFW_PRESS)
     {
-        position.x += 0.001f;
-        rotation.x = 90.f;
-        rotation.y = 0.f;
-        rotation.z = 0.f;
+        position.x += speed;
+        rotation = glm::vec3(0.f, 0.f, 0.f);
     }
     else if (glfwGetKey(window,GLFW_KEY_Y) == GLFW_PRESS)
     {
-        position.z -= 0.001f;
-        rotation.x = 90.f;
-        rotation.y = 0.f;
-        rotation.z = -90.f;
+        position.z -= speed;
+        rotation = glm::vec3(0.f, 90.f, 0.f);
     }
     else if (glfwGetKey(window,GLFW_KEY_H) == GLFW_PRESS)
     {
-        position.z += 0.001f;
-        rotation.x = 90.f;
-        rotation.y = 0.f;
-        rotation.z = 90.f;
+        position.z += speed;
+        rotation = glm::vec3(0.f, -90.f, 0.f);
     }
     else if (glfwGetKey(window,GLFW_KEY_W) == GLFW_PRESS)
     {
-        position.y += 0.001f;
-        rotation.x = 90.f;
-        rotation.y = 90.f;
-        rotation.z = 0.f;
-
+        position.y += speed;
+        rotation = glm::vec3(0.f, 0.f, 90.f);
     }
     else if (glfwGetKey(window,GLFW_KEY_S) == GLFW_PRESS)
     {
-        position.y -= 0.001f;
-        rotation.x = 90.f;
-        rotation.y = -90.f;
-        rotation.z = 0.f;
+        position.y -= speed;
+        rotation = glm::vec3(0.f, 0.f, -90.f);
     }
 }
 void Pacman::draw(Shader &shaderProgram)

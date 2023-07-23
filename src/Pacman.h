@@ -22,6 +22,8 @@ class Pacman
 private:
     int steps;
     double radius;
+
+    float speed;
 public:
     std::vector<Vertex> vertices;
     std::vector<GLuint> indices;
