@@ -14,12 +14,16 @@
 #include "Shader.h"
 #include "Camera.h"
 #include "Level.h"
+#include "text_renderer.h"
 
 const char * vertex_shader_file = "C:\\7mo Semestre\\Computacion Grafica\\TrabajoFinal\\src\\shader.vert";
 const char * fragment_shader_file = "C:\\7mo Semestre\\Computacion Grafica\\TrabajoFinal\\src\\shader.frag";
 
 const char * vertex_texshader_file = "C:\\7mo Semestre\\Computacion Grafica\\TrabajoFinal\\src\\texshader.vert";
 const char * fragment_texshader_file = "C:\\7mo Semestre\\Computacion Grafica\\TrabajoFinal\\src\\texshader.frag";
+
+const char * vertex_text_shader_file = "C:\\7mo Semestre\\Computacion Grafica\\TrabajoFinal\\src\\text_shader.vert";
+const char * fragment_text_shader_file = "C:\\7mo Semestre\\Computacion Grafica\\TrabajoFinal\\src\\text_shader.frag";
 
 const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 800;
@@ -64,9 +68,13 @@ int main()
 	Shader ourShader(vertex_shader_file, fragment_shader_file);
 	Shader texShader(vertex_texshader_file, fragment_texshader_file);
 
-	Camera camera(SCR_WIDTH, SCR_HEIGHT, glm::vec3(0.0f, -3.0f, 3.f));
-/*	Ghost ghost(0.18f, 22);
+	Shader text_rendShader(vertex_text_shader_file,fragment_text_shader_file);
+	glm::mat4 projection = glm::ortho(0.0f, static_cast<float>(SCR_WIDTH), 0.0f, static_cast<float>(SCR_HEIGHT));
+    text_rendShader.use();
+    glUniformMatrix4fv(glGetUniformLocation(text_rendShader.ID, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
 	
+	Camera camera(SCR_WIDTH, SCR_HEIGHT, glm::vec3(0.0f, -3.0f, 3.f));
+	/*
 	std::vector<std::string> matrix =
 	{{"b---a| |b---a"},
 	 {"|   || ||   |"},
@@ -119,6 +127,13 @@ int main()
 	};	
 
 	Level level1(glm::vec3(0.0f, 0.0f, 0.0f), matrix);
+
+	std::string points ;
+	TextRenderer text_renderer= TextRenderer(800,800);
+    text_renderer.Load("C:\\7mo Semestre\\Computacion Grafica\\TrabajoFinal\\fonts\\OCRAEXT.TTF", 24);
+	glEnable(GL_BLEND);
+	glDisable(GL_CULL_FACE);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	
 	// Main while loop
 	while (!glfwWindowShouldClose(window))
@@ -131,14 +146,14 @@ int main()
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 		// Tell OpenGL which Shader Program we want to use
 
-		level1.render_level(window, ourShader, texShader, camera);
+		level1.render_level(window, ourShader, texShader, text_rendShader, camera);
 		// Swap the back buffer with the front buffer
 		glfwSwapBuffers(window);
 	}
 
 	ourShader.Delete();
 	texShader.Delete();
-	
+	text_rendShader.Delete();
 	// Delete window before ending the program
 	glfwDestroyWindow(window);
 	// Terminate GLFW before ending the program
