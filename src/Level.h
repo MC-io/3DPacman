@@ -6,6 +6,7 @@
 #include "Food.h"
 #include "Camera.h"
 #include "Ghost.h"
+#include "Cherry.h"
 #include "text_renderer.h"
 
 class Level
@@ -15,6 +16,7 @@ public:
     Pacman * pacman;
     std::vector<Food*> food_vector;
     std::vector<Ghost*> ghosts;
+    std::vector<Cherry*> cherries;
     TextRenderer* text_renderer;
 
     bool game_over;

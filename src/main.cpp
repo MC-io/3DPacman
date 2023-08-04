@@ -15,6 +15,7 @@
 #include "Camera.h"
 #include "Level.h"
 #include "text_renderer.h"
+#include "Cherry.h"
 
 const char * vertex_shader_file = "C:\\7mo Semestre\\Computacion Grafica\\TrabajoFinal\\src\\shader.vert";
 const char * fragment_shader_file = "C:\\7mo Semestre\\Computacion Grafica\\TrabajoFinal\\src\\shader.frag";
@@ -24,6 +25,8 @@ const char * fragment_texshader_file = "C:\\7mo Semestre\\Computacion Grafica\\T
 
 const char * vertex_text_shader_file = "C:\\7mo Semestre\\Computacion Grafica\\TrabajoFinal\\src\\text_shader.vert";
 const char * fragment_text_shader_file = "C:\\7mo Semestre\\Computacion Grafica\\TrabajoFinal\\src\\text_shader.frag";
+
+const char * font_file = "";
 
 const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 800;
@@ -121,14 +124,14 @@ int main()
 	 {"#.##.#.#...#.#"},
 	 {"#.##.#.#.#.#@#"},
 	 {"#.##.##.####.#"},
-	 {"#.##.#...###.#"},
+	 {"#.##.#.*.###.#"},
 	 {"#....@.#...#.#"},
 	 {"##############"},
 	};	
 
 	Level level1(glm::vec3(0.0f, 0.0f, 0.0f), matrix);
 
-	std::string points ;
+	std::string points;
 	TextRenderer text_renderer= TextRenderer(800,800);
     text_renderer.Load("C:\\7mo Semestre\\Computacion Grafica\\TrabajoFinal\\fonts\\OCRAEXT.TTF", 24);
 	glEnable(GL_BLEND);

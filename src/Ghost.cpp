@@ -132,10 +132,12 @@ Ghost::~Ghost()
 }
 
 void Ghost::move(std::vector<std::string> matrix, float map_size)
-{
-    int x = position.x / (map_size * 2);
-    int y = position.y / (map_size * 2);
+{/*
+    int x = matrix.size() - 1 - (int)(position.y / (map_size * 2));
+    int y = position.x / (map_size * 2);
 
+    std::cout << matrix.size() << ' ' << y << '\n';
+    
     std::vector<std::vector<int>> posibles;
     
     if (x > 0 && matrix[x - 1][y] != '#')
@@ -155,25 +157,25 @@ void Ghost::move(std::vector<std::string> matrix, float map_size)
         posibles.push_back({0, 1});
     }
 
-    if (posibles.size() == 2 && (posibles[0][0] * - 1) == posibles[1][0] && (posibles[0][1] * - 1) == posibles[1][1])
+    if (posibles.size() == 2 && (posibles[0][0] * (-1)) == posibles[1][0] && (posibles[0][1] * (-1)) == posibles[1][1])
     {
         if (prev_mov[0] == 0 && prev_mov[1] == 0)
         {
             prev_mov = posibles[0];
         }
-        position.x += (float)prev_mov[0] * speed;
-        position.y += (float)prev_mov[1] * speed;
+        position.x += (float)prev_mov[1] * speed;
+        position.y -= (float)prev_mov[0] * speed;
     }
     else
     {
         int index = std::rand() % posibles.size();
 
-        position.x += (float)posibles[index][0] * speed;
-        position.y += (float)posibles[index][1] * speed;
+        position.x += (float)posibles[index][1] * speed;
+        position.y -= (float)posibles[index][0] * speed;
 
         prev_mov = posibles[index];
     }
-
+*/
 }
 
 void Ghost::draw(Shader &shaderProgram)

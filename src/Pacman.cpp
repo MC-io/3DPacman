@@ -8,7 +8,11 @@ Pacman::Pacman(double radius_, int steps_)
     this->speed = 0.001;
     this->vertices.resize((steps + 1) * (steps / 2 - 1) + 3);
     this->indices.resize(((steps + 1) * (steps / 2 - 1) * 6) + ((steps + 1) * (steps / 2 - 1) * 3) + steps * 3 + 3);
-
+    this->powerup_max_timer = 2500.f;
+    this->powerup_timer = 0.0f;
+    this->in_powerup = false;
+    this->going_powerup = false;
+    this->leaving_powerup = false;
     this->position = glm::vec3(0.f);
     this->rotation = glm::vec3(0.f);
     this->scale = glm::vec3(1.f);
@@ -111,6 +115,19 @@ Pacman::~Pacman()
 {
     
 }
+
+void Pacman::activate_powerup()
+{
+    this->in_powerup = true;
+    this->going_powerup = true;
+}
+
+void Pacman::disable_powerup()
+{
+    this->in_powerup = false;
+    this->leaving_powerup = true;
+}
+
 void Pacman::updateInput(GLFWwindow * window)
 {
     if (glfwGetKey(window,GLFW_KEY_UP) == GLFW_PRESS)
@@ -172,6 +189,49 @@ void Pacman::draw(Shader &shaderProgram)
 {
     shaderProgram.use();
 
+    if (this->in_powerup)
+    {
+        if (this->powerup_timer >= this->powerup_max_timer)
+        {
+            this->powerup_timer = 0.f;
+            this->disable_powerup();
+        }
+        else 
+        {
+            this->powerup_timer += 0.1f;
+        }
+    }
+
+    if (this->going_powerup)
+    {
+        if (this->scale.x < 2.f)
+        {
+            this->scale.x += 0.001f;
+            this->scale.y += 0.001f;
+            this->scale.z += 0.001f;
+        }
+        else
+        {
+            this->scale = glm::vec3(2.f,2.f,2.f);
+            this->going_powerup = false;
+        }
+    }
+
+    if (this->leaving_powerup)
+    {
+        if (this->scale.x > 1.f)
+        {
+            this->scale.x -= 0.001f;
+            this->scale.y -= 0.001f;
+            this->scale.z -= 0.001f;
+        }
+        else
+        {
+            this->scale = glm::vec3(1.f,1.f,1.f);
+            this->leaving_powerup = false;
+        }
+    }
+
     // create transformations
     glm::mat4 model = glm::mat4(1.0f);
     model = glm::translate(model, position);
@@ -186,7 +246,10 @@ void Pacman::draw(Shader &shaderProgram)
 
     double  timeValue = glfwGetTime();
     int change =  (steps + 1) * 3 - 3 * (int)(sin(timeValue * 20) * (steps / 12) + (steps / 12) + 1);
-    shaderProgram.setFloat4("ourColor",  1.0f, 0.8f, 0.0f, 1.0f);
+    
+    
+    if (!this->in_powerup) shaderProgram.setFloat4("ourColor",  1.0f, 0.8f, 0.0f, 1.0f);
+    else shaderProgram.setFloat4("ourColor",  1.0f, sin(glfwGetTime() * 10) + 1.f, 0.0f, 1.0f);
     glDrawElements(GL_TRIANGLES, change - ((steps + 1) * 3 - change), GL_UNSIGNED_INT, (void*)(((steps + 1) * 3 - change) * sizeof(float)));
 
     for (int i = 0; i < (steps / 2 - 2); i++)

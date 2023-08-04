@@ -24,6 +24,14 @@ private:
     double radius;
 
     float speed;
+
+    float powerup_max_timer;
+    float powerup_timer;
+    bool in_powerup;
+    bool going_powerup;
+    bool leaving_powerup;
+
+
 public:
     std::vector<Vertex> vertices;
     std::vector<GLuint> indices;
@@ -40,6 +48,10 @@ public:
     int get_vertices_size();
     int get_indices_size();
     ~Pacman();
+
+    void activate_powerup();
+    void disable_powerup();
+
 	void updateInput(GLFWwindow * window);
     void draw(Shader &shaderProgram);
 };
