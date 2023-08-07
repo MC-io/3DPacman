@@ -14,14 +14,16 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <GLFW/glfw3.h>
 #include "Shader.h"
+#include "Blocc.h"
+#include "Camera.h"
 #include "VAO.h"
 #include "EBO.h"
+
 
 class Pacman
 {
 private:
     int steps;
-    double radius;
 
     float speed;
 
@@ -33,10 +35,15 @@ private:
 
 
 public:
+    double radius;
+
     std::vector<Vertex> vertices;
     std::vector<GLuint> indices;
 
     int pointCounter;
+
+    float speedX;
+    float speedY;
 
 	VAO vao;
 
@@ -45,14 +52,14 @@ public:
 	glm::vec3 scale;
 
 	Pacman(double radius_, int steps_);
-    int get_vertices_size();
-    int get_indices_size();
     ~Pacman();
 
     void activate_powerup();
     void disable_powerup();
 
-	void updateInput(GLFWwindow * window);
+    bool check_colission(std::vector<Blocc*> &blocks,glm::vec3 direction, float map_size);
+
+	void updateInput(GLFWwindow * window, std::vector<Blocc*> blocks, float map_size, Camera & camera);
     void draw(Shader &shaderProgram);
 };
 

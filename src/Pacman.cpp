@@ -6,6 +6,9 @@ Pacman::Pacman(double radius_, int steps_)
     this->radius = radius_;
     this->steps = steps_;
     this->speed = 0.001;
+    this->speedX = 0.001;
+    this->speedY = 0.001;
+
     this->vertices.resize((steps + 1) * (steps / 2 - 1) + 3);
     this->indices.resize(((steps + 1) * (steps / 2 - 1) * 6) + ((steps + 1) * (steps / 2 - 1) * 3) + steps * 3 + 3);
     this->powerup_max_timer = 2500.f;
@@ -103,14 +106,6 @@ Pacman::Pacman(double radius_, int steps_)
     vbo.Unbind();
     ebo.Unbind();
 }
-int Pacman::get_vertices_size()
-{
-    return this->vertices.size();
-}
-int Pacman::get_indices_size()
-{
-    return this->indices.size();
-}
 Pacman::~Pacman() 
 {
     
@@ -128,8 +123,27 @@ void Pacman::disable_powerup()
     this->leaving_powerup = true;
 }
 
-void Pacman::updateInput(GLFWwindow * window)
+bool Pacman::check_colission(std::vector<Blocc*> &blocks,glm::vec3 direction, float map_size)
 {
+    bool touch = true;
+    glm::vec3 half_extents = glm::vec3(map_size, map_size, map_size);
+    for(int i = 0; i < blocks.size(); i++)
+    {
+        glm::vec3 difference = (this->position + direction) - blocks[i]->center_point;
+        glm::vec3 clamped = glm::clamp(difference, -half_extents, half_extents);
+        glm::vec3 closest = blocks[i]->center_point + clamped;
+        difference = closest - (this->position + direction);
+        if(glm::length(difference) <= (this->radius * this->scale.x))
+        {
+            touch = false;
+        }
+    }
+    return touch;
+}   
+
+void Pacman::updateInput(GLFWwindow * window,std::vector<Blocc*> blocks, float map_size, Camera & camera)
+{
+    glm::vec3 direction(0.0f, 0.0f, 0.0f);
     if (glfwGetKey(window,GLFW_KEY_UP) == GLFW_PRESS)
     {
         rotation.y += 0.1f;
@@ -156,12 +170,12 @@ void Pacman::updateInput(GLFWwindow * window)
     }
     if (glfwGetKey(window,GLFW_KEY_A) == GLFW_PRESS)
     {
-        position.x -= speed;
+        direction = glm::vec3(-speed, 0.0f, 0.0f);
         rotation = glm::vec3(0.f, 0.f, 180.f);
     }
     else if (glfwGetKey(window,GLFW_KEY_D) == GLFW_PRESS)
     {
-        position.x += speed;
+        direction = glm::vec3(speed, 0.0f, 0.0f);
         rotation = glm::vec3(0.f, 0.f, 0.f);
     }
     else if (glfwGetKey(window,GLFW_KEY_Y) == GLFW_PRESS)
@@ -176,13 +190,25 @@ void Pacman::updateInput(GLFWwindow * window)
     }
     else if (glfwGetKey(window,GLFW_KEY_W) == GLFW_PRESS)
     {
-        position.y += speed;
+        direction = glm::vec3(0.0f, speed, 0.0f);
         rotation = glm::vec3(0.f, 0.f, 90.f);
     }
     else if (glfwGetKey(window,GLFW_KEY_S) == GLFW_PRESS)
     {
-        position.y -= speed;
+        direction = glm::vec3(0.0f, -speed, 0.0f);
         rotation = glm::vec3(0.f, 0.f, -90.f);
+    }
+
+    if (direction != glm::vec3(0.0f, 0.0f, 0.0f))
+    {
+        bool touch = this->check_colission(blocks, direction, map_size);
+        if (touch)
+        {
+            position.x += direction.x;
+            position.y += direction.y;
+            camera.position.x += direction.x;
+            camera.position.y += direction.y;
+        }
     }
 }
 void Pacman::draw(Shader &shaderProgram)

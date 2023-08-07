@@ -16,6 +16,7 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <GLFW/glfw3.h>
 #include "Shader.h"
+#include "Maze.h"
 #include "VAO.h"
 #include "EBO.h"
 
@@ -23,11 +24,14 @@ class Ghost
 {
 private:
     int steps;
-    double radius;
     float speed;
 
     std::vector<int> prev_mov;
+    int maze_pos_x;
+    int maze_pos_y;
 public:
+    double radius;
+
     std::vector<Vertex> vertices;
     std::vector<GLuint> indices;
 
@@ -37,9 +41,11 @@ public:
 	glm::vec3 rotation;
 	glm::vec3 scale;
 
-	Ghost(double radius_, int steps_, float x, float y);
+	Ghost(double radius_, int steps_, float x, float y, float map_size);
+    bool check_colission(std::vector<Blocc*> &blocks,glm::vec3 direction, float map_size);
+
     ~Ghost();
-	void move(std::vector<std::string> matrix, float map_size);
+	void move(Maze & map, float map_size);
     void draw(Shader &shaderProgram);
 
 };

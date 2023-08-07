@@ -26,7 +26,7 @@ const char * fragment_texshader_file = "C:\\7mo Semestre\\Computacion Grafica\\T
 const char * vertex_text_shader_file = "C:\\7mo Semestre\\Computacion Grafica\\TrabajoFinal\\src\\text_shader.vert";
 const char * fragment_text_shader_file = "C:\\7mo Semestre\\Computacion Grafica\\TrabajoFinal\\src\\text_shader.frag";
 
-const char * font_file = "";
+const char * font_file = "C:\\7mo Semestre\\Computacion Grafica\\TrabajoFinal\\fonts\\OCRAEXT.TTF";
 
 const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 800;
@@ -77,48 +77,10 @@ int main()
     glUniformMatrix4fv(glGetUniformLocation(text_rendShader.ID, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
 	
 	Camera camera(SCR_WIDTH, SCR_HEIGHT, glm::vec3(0.0f, -3.0f, 3.f));
-	/*
-	std::vector<std::string> matrix =
-	{{"b---a| |b---a"},
-	 {"|   || ||   |"},
-	 {"| | cd cd | |"},
-	 {"|           |"},
-	 {"| | b-----a |"},
-	 {"| | |b---a| |"},
-	 {"| | ||ba || |"},
-	 {"| | |cd| || |"},
-	 {"| | c--d cd |"},
-	 {"|           |"},
-	 {"|   b---a | |"},
-	 {"c-- |b-a| | |"},
-	 {"|   |c-d| | |"},
-	 {"| | c---d | |"},
-	 {"| |       | |"},
-	 {"| | b---a | |"},
-	 {"| | |b-a| | |"},
-	 {"| | |c-d| | |"},
-	 {"| | c---d | |"},
-	 {"|           |"},
-	 {"|   | b-a | |"},
-	 {"|-  | | | | |"},
-	 {"|  -| | | | |"},
-	 {"|-  | c-d | |"},
-	 {"|           |"},
-	 {"| | b-----a |"},
-	 {"| | c-----d |"},
-	 {"| |         |"},
-	 {"| | b---a | |"},
-	 {"| | |ba | | |"},
-	 {"|   ||| |   |"},
-	 {"| | cdc-d | |"},
-	 {"| |       | |"},
-	 {"|   ba ba   |"},
-	 {"c---d| |c---d"},
-	};*/
-
+	
 	std::vector<std::string> matrix =
 	{{"####### ######"},
-	 {"#....##.##...#"},
+	 {"#.o..##.##...#"},
 	 {"#.##.##.##.#.#"},
 	 {"#.##..@..#...#"},
 	 {"#.##.#.#...#.#"},
@@ -129,11 +91,11 @@ int main()
 	 {"##############"},
 	};	
 
-	Level level1(glm::vec3(0.0f, 0.0f, 0.0f), matrix);
+	Level level1(matrix, camera);
 
 	std::string points;
 	TextRenderer text_renderer= TextRenderer(800,800);
-    text_renderer.Load("C:\\7mo Semestre\\Computacion Grafica\\TrabajoFinal\\fonts\\OCRAEXT.TTF", 24);
+    text_renderer.Load(font_file, 24);
 	glEnable(GL_BLEND);
 	glDisable(GL_CULL_FACE);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);

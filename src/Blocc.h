@@ -28,6 +28,7 @@ public:
 
 	VAO vao;
 
+    glm::vec3 center_point;
 	glm::vec3 position;
 	glm::vec3 rotation;
 	glm::vec3 scale;

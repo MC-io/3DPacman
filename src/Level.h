@@ -19,9 +19,13 @@ public:
     std::vector<Cherry*> cherries;
     TextRenderer* text_renderer;
 
-    bool game_over;
+    bool game_over = false;
+    bool instruccion = false;
+    bool start_game = false;
 
-    Level(glm::vec3 start_pos, std::vector<std::string> matrix);
+    glm::vec3 start_pos;
+
+    Level(std::vector<std::string> matrix, Camera & camera);
     void render_level(GLFWwindow * window, Shader & color_shader, Shader & texture_shader, Shader & text_shader, Camera & camera);
 };
 

@@ -48,6 +48,35 @@ Blocc::Blocc(double size_, float angle, float x, float y)
     this->vertices[22].pos = glm::vec3(size + x, -size + y, -size); 
     this->vertices[23].pos = glm::vec3(-size + x, -size + y, -size);
 
+    for (int i = 0; i < 4; i++)
+    {   
+        
+        this->center_point.x = this->center_point.x + this->vertices[i].pos.x;
+         this->center_point.y = this->center_point.y + this->vertices[i].pos.y;
+          this->center_point.z = this->center_point.z + this->vertices[i].pos.z;
+    }
+    for (int i = 6; i < 12; i+=4)
+    {   
+        this->center_point.x = this->center_point.x + this->vertices[i].pos.x;
+        this->center_point.y = this->center_point.y + this->vertices[i].pos.y;
+        this->center_point.z = this->center_point.z + this->vertices[i].pos.z;
+        //std::cout<<this->center_point.x<<std::endl;
+        this->center_point.x = this->center_point.x + this->vertices[i+1].pos.x;
+        this->center_point.y = this->center_point.y + this->vertices[i+1].pos.y;
+          
+        this->center_point.z = this->center_point.z + this->vertices[i+1].pos.z;
+
+         //std::cout<<this->vertices[i].pos.x<<" "<<this->vertices[i+1].pos.x<<std::endl;
+    }
+
+    
+    if (std::abs(this->center_point.z) < 1e-6) 
+    {
+        this->center_point.z = 0.0;
+    }
+    // this->center_point.z = this->center_point.z + this->vertices[6].pos.z;
+    this->center_point = this->center_point / 8.f;
+
 
     for (int i = 0; i < 24; i++)
     {
