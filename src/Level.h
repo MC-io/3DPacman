@@ -23,6 +23,10 @@ public:
     bool instruccion = false;
     bool start_game = false;
 
+    bool mode2d;
+    bool mode3d;
+
+
     glm::vec3 start_pos;
 
     Level(std::vector<std::string> matrix, Camera & camera);

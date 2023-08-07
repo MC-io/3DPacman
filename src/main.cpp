@@ -77,6 +77,7 @@ int main()
     glUniformMatrix4fv(glGetUniformLocation(text_rendShader.ID, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
 	
 	Camera camera(SCR_WIDTH, SCR_HEIGHT, glm::vec3(0.0f, -3.0f, 3.f));
+
 	
 	std::vector<std::string> matrix =
 	{{"####### ######"},

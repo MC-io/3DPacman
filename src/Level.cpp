@@ -11,6 +11,9 @@ Level::Level(std::vector<std::string> matrix, Camera & camera)
     this->pacman = new Pacman(0.12, 40);
 	this->pacman->rotation.x = 90.f;
 
+	mode2d = false;
+	mode3d  =true;
+
     for (int i = 0; i < matrix.size(); i++)
     {
         for (int j = 0; j < matrix[i].size(); j++)
@@ -107,12 +110,37 @@ void Level::render_level(GLFWwindow * window, Shader & color_shader, Shader & te
 			pacman->position = start_pos;
 			camera.position.x = pacman->position.x;
 			camera.position.y = pacman->position.y - 3.0f;
+			camera.orientation = glm::vec3(0.0f, 0.707f, -0.707f);
+			camera.up = glm::vec3(0.0f, 0.707f, 0.707f);
 		}
 	}
 	else
 	{
-		camera.position.x = pacman->position.x;
-		camera.position.y = pacman->position.y - 3.0f;
+		if(glfwGetKey(window,GLFW_KEY_2)==GLFW_PRESS)
+		{
+			mode2d = true;
+			mode3d = false;
+		}
+		else if (glfwGetKey(window,GLFW_KEY_3)==GLFW_PRESS)
+		{
+			mode3d = true;
+			mode2d = false;
+		}
+		if (mode2d)
+		{
+			camera.position.x = pacman->position.x;
+			camera.position.y = pacman->position.y;
+			camera.orientation = glm::vec3(0.0f, 0.0f, -1.0f);
+			camera.up = glm::vec3(0.0f, 1.0f, 0.0f);
+		}
+		else 
+		{
+			camera.position.x = pacman->position.x;
+			camera.position.y = pacman->position.y - 3.0f;
+			camera.orientation = glm::vec3(0.0f, 0.707f, -0.707f);
+			camera.up = glm::vec3(0.0f, 0.707f, 0.707f);
+		}
+
 		this->pacman->updateInput(window, map->blocks, map->map_size, camera);
 
 		this->pacman->draw(color_shader);
